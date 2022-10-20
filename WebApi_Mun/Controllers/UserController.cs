@@ -73,13 +73,14 @@ namespace WebApi_Mun.Controllers
         [HttpPost]
         public IHttpActionResult Insert([FromBody] UserInsertModel data) 
         {
-            if (!ModelState.IsValid)
-            {
-                return Content(HttpStatusCode.BadRequest, "Los datos no son validos");
-            }
-            var result = user.Insert(data);
-            if (result == -2)
-                return Content(HttpStatusCode.BadRequest, "Los datos solicitados no existen");
+            //if (!ModelState.IsValid)
+            //{
+            //    return Content(HttpStatusCode.BadRequest, "Los datos no son validos");
+            //}
+            //var result = user.Insert(data);
+            //if (result == -2)
+            //    return Content(HttpStatusCode.BadRequest, "Los datos solicitados no existen");
+            //return Ok();
             return Ok();
         }
 

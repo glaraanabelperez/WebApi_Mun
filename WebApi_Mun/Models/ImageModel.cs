@@ -6,27 +6,27 @@ using System.Web;
 
 namespace WebApi_Mun.Models
 {
-    public class UserModel
+    public class ProductImageModel
     {
         /// <summary>
-        /// Identificador producto
+        /// Identificador tabla ProductImage
         /// </summary>
-        public int? UserId { get; set; }
+        public int? ProductImageId { get; set; }
 
         /// <summary>
-        /// username
+        /// Identificador prducto
         /// </summary>
-        public string  UserName { get; set; }
+        public int? ProductId { get; set; }
 
         /// <summary>
-        /// contraseña del usuario
+        /// Identificador imagen
         /// </summary>
-        public string Password { get; set; }
+        public int? ImageId { get; set; }
 
         /// <summary>
-        /// Rol
+        /// name
         /// </summary>
-        public int RoleId { get; set; }
+        public string  Name { get; set; }
 
        
     }

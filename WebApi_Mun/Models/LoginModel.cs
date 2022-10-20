@@ -9,20 +9,10 @@ namespace WebApi_Mun.Models
     public class LoginModel
     {
         /// <summary>
-        /// Identificador 
-        /// </summary>
-        public int? UserId { get; set; }
-
-        /// <summary>
-        /// Identificador Nombre negocio
-        /// </summary>
-        public string BusinessName { get; set; }
-
-        /// <summary>
         /// email
         /// </summary>
         [Required]
-        public string email { get; set; }
+        public string UserName { get; set; }
 
         /// <summary>
         /// contraseña del usuario

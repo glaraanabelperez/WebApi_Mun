@@ -28,7 +28,7 @@ namespace WebApi_Mun.Data
             /// <summary>
             /// Nombre del producto
             /// </summary>
-            Title=1
+            Name=1
 
         }
 
@@ -46,9 +46,10 @@ namespace WebApi_Mun.Data
             public bool? State { get; set; }
 
             /// <summary>
-            /// Búsqueda por comercio
+            /// Filtro para el campo "Destacados"
             /// </summary>
-            public int? UserId { get; set; }
+            public bool? Featured { get; set; }
+
 
             /// <summary>
             /// Búsqueda por texto libre
@@ -56,9 +57,9 @@ namespace WebApi_Mun.Data
             public int? CategoryId { get; set; }
 
             /// <summary>
-            /// Destacados
+            /// Búsqueda por texto libre
             /// </summary>
-            public bool? Featured { get; set; }
+            public int? MarcaId { get; set; }
 
    
         }
@@ -68,13 +69,17 @@ namespace WebApi_Mun.Data
         #region Sql
 
         private const string SELECT_ALL =
-        ";SELECT A.ProductId, A.CreatedOn,A.[Title], A.[Subtitle], A.[Description], " +
-            " A.Featured as Featured, A.CategoryId_FK as CategoryId, A.UserId_FK as UserId , " +
-            " A.NameImage, A.Price as Price ,A.Promotion, A.State" +
-            ", U.Business_Name as Buisness, o.[Description] as CategoryName " +
-            " FROM Products AS A "+
-            " INNER JOIN dbo.[Users] U ON U.UserId = A.UserId_FK " +
+        ";SELECT A.ProductId, A.[Name] as ProductName,  A.[Description] " +
+            " ,A.CategoryId_FK as CategoryId, o.[Name] as CategoryName, A.MarcaId_FK as MarcaId, mar.[Name] as MarcaName " +
+            " ,A.Price, A.DiscountId_FK as DiscountId, dis.[Amount] DiscountAmount, A.State, A.Featured " +
+            " ,imp.ProductImageId, imp.ImageId_FK as ImageId, img.[Name] as ImageName" +
+            " ,A.CreatedBy_FK as UserId" +
+            " FROM Products AS A " +
             " INNER JOIN dbo.Categories O ON O.CategoryId = A.CategoryId_FK " +
+            " INNER JOIN [dbo].[Marcas] mar on A.MarcaId_FK= mar.MarcaId" +
+            " left JOIN [dbo].[Discounts] dis on A.DiscountId_FK= dis.DiscountId" +
+            " left JOIN [dbo].[ProductImage] imp on imp.ProductId_FK= A.ProductId" +
+            " left JOIN [dbo].[Images] img on img.ImageId= imp.ImageId_FK" +
             " {2} " +
             " ORDER BY {0} {1} ";
 
@@ -105,11 +110,11 @@ namespace WebApi_Mun.Data
             if (orderField.HasValue)
                 strOrderField = orderField.ToString();
             else
-                strOrderField = OrderFields.Title.ToString();
+                strOrderField = OrderFields.Name.ToString();
 
             using (var connection = new SqlConnection(connectionString))
             {
-                SqlCommand objSqlCmd = new SqlCommand("", connection);
+              SqlCommand objSqlCmd = new SqlCommand("", connection);
               
               //Agregando parametros
               string strFilter = string.Empty;
@@ -121,10 +126,11 @@ namespace WebApi_Mun.Data
                             objSqlCmd.Parameters.Add("@Id_Category", SqlDbType.Int).Value = filter.CategoryId.Value;
 
                         }
-                        if (filter.UserId.HasValue)
+                        if (filter.MarcaId.HasValue)
                         {
-                            strFilter += " AND [A].UserId_FK=@Id_User";
-                            objSqlCmd.Parameters.Add("@Id_User", SqlDbType.Int).Value = filter.UserId.Value;
+                            strFilter += " AND [A].MarcaId_FK=@Id_Marca";
+                            objSqlCmd.Parameters.Add("@Id_Marca", SqlDbType.Int).Value = filter.MarcaId.Value;
+
                         }
                         if (filter.State.HasValue)
                         {
@@ -166,9 +172,75 @@ namespace WebApi_Mun.Data
 
                         DataSet dataset = new DataSet();
                         adapter.Fill(dataset);
-                        connection.Close();
+                        
                         recordCount = (int)dataset.Tables[0].Rows[0][0];
-                        return dataset.Tables[1];
+
+
+                    List<ProductModelDto> productList = new List<ProductModelDto>();
+                    foreach (DataRow row in dataset.Tables[1].Rows)
+                    {
+
+                        //string valor1 = Convert.ToString(row["columna1"]);
+                        int productId = Convert.ToInt32(row["ProductId"]);
+                        if (productList.Exists(p => p.ProductId == productId)==true)
+                        {
+                            ProductImageModel im = new ProductImageModel();
+                            im.ProductImageId = Convert.ToInt32(row["ProductImageId"]);
+
+                            productList.Find(p => p.ProductId == productId).images.Add(im);
+                        }
+                        else
+                        {
+
+                            ProductImageModel im = new ProductImageModel();
+                            im.ProductImageId = Convert.ToInt32(row["ProductImageId"]);
+
+                            ProductModelDto product = new ProductModelDto();
+                            product.ProductId = productId;
+                            product.images.Add(im);
+                            productList.Add(product);
+                        }
+
+                    }
+
+
+                    //SqlDataReader reader = objSqlCmd.ExecuteReader();
+
+                    //using (reader)
+                    //{
+                    //    while (reader.Read())
+                    //    {
+                    //        if (!productList.Exists(p => p.ProductId == (int)reader["ProductId"]))
+                    //        {
+                    //            ProductImageModel im = new ProductImageModel();
+                    //            im.ProductImageId = (int)reader["ProductImageId"];
+                    //            im.ImageId = (int)reader["ImageId"];
+                    //            im.Name = (string)reader["ImageName"];
+                    //            im.ProductId = (int)reader["ProductId"];
+
+                    //            productList.Find(p => p.ProductId == (int)reader["ProductId"]).images.Add(im);
+                    //        }
+                    //        else
+                    //        {
+                                
+                    //            ProductImageModel im = new ProductImageModel();
+                    //                im.ProductImageId = (int)reader["ProductImageId"];
+                    //                im.ImageId = (int)reader["ImageId"];
+                    //                im.Name = (string)reader["ImageName"];
+                    //                im.ProductId = (int)reader["ProductId"];
+
+                    //            ProductModelDto product = new ProductModelDto();
+                    //            product.ProductId = (int)reader["ProductImageId"];
+                    //            product.images.Add(im);
+                    //        }
+                            
+                 
+                    //    }
+                    //}
+
+
+                    connection.Close();
+                    return dataset.Tables[1];
                     }
               else
                     {
@@ -218,17 +290,17 @@ namespace WebApi_Mun.Data
                             return null;
                         }
    
-                            items.ProductId = objDR.GetInt32(0);
-                            items.CategoryId = objDR.GetInt32(1);
-                            items.UserId = objDR.GetInt32(2);
-                            items.State = objDR.GetByte(3) == 0 ? false : true;
-                            items.Title = objDR.GetString(4);
-                            items.Subtitle = objDR.GetString(5);
-                            items.Description = objDR.GetString(6);
-                            items.NameImage = objDR.GetString(7);
-                            items.Price = (double)objDR.GetDecimal(9);
-                            items.Featured = objDR.GetByte(10) == 0 ? false : true;
-                            items.Promotion = objDR.GetString(11);
+                            //items.ProductId = objDR.GetInt32(0);
+                            //items.CategoryId = objDR.GetInt32(1);
+                            //items.UserId = objDR.GetInt32(2);
+                            //items.State = objDR.GetByte(3) == 0 ? false : true;
+                            //items.Title = objDR.GetString(4);
+                            //items.Subtitle = objDR.GetString(5);
+                            //items.Description = objDR.GetString(6);
+                            //items.NameImage = objDR.GetString(7);
+                            //items.Price = (double)objDR.GetDecimal(9);
+                            //items.Featured = objDR.GetByte(10) == 0 ? false : true;
+                            //items.Promotion = objDR.GetString(11);
 
                         return items;
                     }
@@ -263,19 +335,19 @@ namespace WebApi_Mun.Data
 
                  using(SqlCommand objCmd = new SqlCommand(store, connection))
                 {
-                    if (store.Equals("Product_Update"))
-                        objCmd.Parameters.Add("@ProductId", SqlDbType.Int).Value = productId;
-                    objCmd.CommandType = CommandType.StoredProcedure;
-                    objCmd.Parameters.Add("@UserId", SqlDbType.Int).Value = data.UserId;
-                    objCmd.Parameters.Add("@CategoryId", SqlDbType.Int).Value = data.CategoryId;
-                    objCmd.Parameters.Add("@Title", SqlDbType.VarChar, 250).Value = data.Title;
-                    objCmd.Parameters.Add("@SubTitle", SqlDbType.VarChar, 250).Value = data.Subtitle;
-                    objCmd.Parameters.Add("@Description", SqlDbType.VarChar, 250).Value = data.Description;
-                    objCmd.Parameters.Add("@Featured", SqlDbType.TinyInt).Value = (data.Featured == true ? 1 : 0);
-                    objCmd.Parameters.Add("@NameImage", SqlDbType.VarChar, 250).Value = data.NameImage;
-                    objCmd.Parameters.Add("@Price", SqlDbType.Money).Value = data.Price;
-                    objCmd.Parameters.Add("@Promotion", SqlDbType.VarChar, 250).Value = data.Promotion;
-                    objCmd.Parameters.Add("@State", SqlDbType.TinyInt).Value = (data.State == true ? 1 : 0);
+                    //if (store.Equals("Product_Update"))
+                    //    objCmd.Parameters.Add("@ProductId", SqlDbType.Int).Value = productId;
+                    //objCmd.CommandType = CommandType.StoredProcedure;
+                    //objCmd.Parameters.Add("@UserId", SqlDbType.Int).Value = data.UserId;
+                    //objCmd.Parameters.Add("@CategoryId", SqlDbType.Int).Value = data.CategoryId;
+                    //objCmd.Parameters.Add("@Title", SqlDbType.VarChar, 250).Value = data.Title;
+                    //objCmd.Parameters.Add("@SubTitle", SqlDbType.VarChar, 250).Value = data.Subtitle;
+                    //objCmd.Parameters.Add("@Description", SqlDbType.VarChar, 250).Value = data.Description;
+                    //objCmd.Parameters.Add("@Featured", SqlDbType.TinyInt).Value = (data.Featured == true ? 1 : 0);
+                    //objCmd.Parameters.Add("@NameImage", SqlDbType.VarChar, 250).Value = data.NameImage;
+                    //objCmd.Parameters.Add("@Price", SqlDbType.Money).Value = data.Price;
+                    //objCmd.Parameters.Add("@Promotion", SqlDbType.VarChar, 250).Value = data.Promotion;
+                    //objCmd.Parameters.Add("@State", SqlDbType.TinyInt).Value = (data.State == true ? 1 : 0);
 
                     connection.Open();
                     var result = objCmd.ExecuteNonQuery();
@@ -309,6 +381,24 @@ namespace WebApi_Mun.Data
             }
         }
 
+
+
+        //private const string SELECT_ALL =
+        //";SELECT A.ProductId, A.[Name],  A.[Description], " +
+        //    " A.CategoryId_FK as CategoryId, o.[Name] as CategoryName, A.MarcaId_FK as MarcaId, mar.[Name] " +
+        //    " A.Price, A.DiscountId_FK, dis.[Name], A.State, A.Featured, A.ImageId_1, im.[Name] as Image1 " +
+        //    " A.ImageId_2, im.[Name]" +
+        //    " A.NameImage, A.Price as Price ,A.Promotion, A.State" +
+        //    ", U.Business_Name as Buisness,  A.Featured as Featured," +
+        //    " FROM Products AS A " +
+        //    " INNER JOIN dbo.[Users] U ON U.UserId = A.UserId_FK " +
+        //    " INNER JOIN dbo.Categories O ON O.CategoryId = A.CategoryId_FK " +
+        //    " INNER JOIN [dbo].[Marcas] mar on A.MarcaId_FK= mar.MarcaId" +
+        //    " left JOIN [dbo].[Discounts] dis on A.DiscountId_FK= dis.DiscountId" +
+        //    " left JOIN [dbo].[Images] im on A.ImageId= A.ImageId_1" +
+        //    " and im.ImageId= A.ImageId_2 and im.ImageId= A.ImageId_3" +
+        //    " {2} " +
+        //    " ORDER BY {0} {1} ";
 
     }
 }

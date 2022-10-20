@@ -30,15 +30,15 @@ namespace WebApi_Mun.Data
                     objCmd.Parameters.Add("@UserId", SqlDbType.Int).Value = userId;
                     SqlDataReader objDR = objCmd.ExecuteReader();
 
-                    while (objDR.Read())
-                        {
-                            var c = new CategoryModel();
-                            c.CategoryId = objDR.GetInt32(0);
-                            c.Description = objDR.GetString(1);
-                            c.UserId = objDR.GetInt32(2);
+                    //while (objDR.Read())
+                    //    {
+                    //        var c = new CategoryModel();
+                    //        c.CategoryId = objDR.GetInt32(0);
+                    //        c.Description = objDR.GetString(1);
+                    //        c.UserId = objDR.GetInt32(2);
 
-                            items.Add(c);
-                        }
+                    //        items.Add(c);
+                    //    }
                         return items.ToArray(); 
 
                 }
@@ -62,18 +62,18 @@ namespace WebApi_Mun.Data
                     objCmd.CommandType = CommandType.StoredProcedure;
                     objCmd.Parameters.Add("@UserId", SqlDbType.Int).Value = userId;
                     connection.Open();
-                    using (var objDR = objCmd.ExecuteReader(CommandBehavior.SingleRow))
-                    {
-                        if (!objDR.Read())
-                        {
-                            return null;
-                        }
+                    //using (var objDR = objCmd.ExecuteReader(CommandBehavior.SingleRow))
+                    //{
+                    //    if (!objDR.Read())
+                    //    {
+                    //        return null;
+                    //    }
 
-                        items.CategoryId = objDR.GetInt32(0);
-                        items.Description = objDR.GetString(1);
-                        items.UserId = objDR.GetInt32(2);
+                    //    items.CategoryId = objDR.GetInt32(0);
+                    //    items.Description = objDR.GetString(1);
+                    //    items.UserId = objDR.GetInt32(2);
 
-                    }
+                    //}
                 }
                 return items;
             }
@@ -87,35 +87,36 @@ namespace WebApi_Mun.Data
         /// <returns><c>true</c> Si se guardaron los datos</returns>
         internal static int Save(int? categoryId, CategoryModel data)
         {
-            using (var connection = new SqlConnection(connectionString))
-            {
+            //using (var connection = new SqlConnection(connectionString))
+            //{
 
-                SqlCommand objCmd;
-                var store = "";
-                if (categoryId.HasValue && categoryId != 0)
-                {
-                    store = "Category_Update";
-                    objCmd = new SqlCommand("Category_Update", connection);
-                    
-                }
-                else
-                    store = "Category_Add";
-                using (objCmd = new SqlCommand(store, connection))
-                {
-                    if(store.Equals("Category_Update"))
-                        objCmd.Parameters.Add("@CategoryId", SqlDbType.Int).Value = categoryId;
+            //    SqlCommand objCmd;
+            //    var store = "";
+            //    if (categoryId.HasValue && categoryId != 0)
+            //    {
+            //        store = "Category_Update";
+            //        objCmd = new SqlCommand("Category_Update", connection);
 
-                    objCmd.CommandType = CommandType.StoredProcedure;
-                    objCmd.Parameters.Add("@UserId", SqlDbType.Date).Value = data.UserId;
-                    objCmd.Parameters.Add("@Description", SqlDbType.Char, 5).Value = data.Description;
+            //    }
+            //    else
+            //        store = "Category_Add";
+            //    using (objCmd = new SqlCommand(store, connection))
+            //    {
+            //        if(store.Equals("Category_Update"))
+            //            objCmd.Parameters.Add("@CategoryId", SqlDbType.Int).Value = categoryId;
 
-                    connection.Open();
-                    var result = objCmd.ExecuteNonQuery();
+            //        objCmd.CommandType = CommandType.StoredProcedure;
+            //        objCmd.Parameters.Add("@UserId", SqlDbType.Date).Value = data.UserId;
+            //        objCmd.Parameters.Add("@Description", SqlDbType.Char, 5).Value = data.Description;
 
-                    return result;
-                }
-                   
-            }
+            //        connection.Open();
+            //        var result = objCmd.ExecuteNonQuery();
+
+            //        return result;
+            //    }
+
+            //}
+            return 0;
            
         }
 

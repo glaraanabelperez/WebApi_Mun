@@ -6,6 +6,7 @@ using System.Web;
 
 namespace WebApi_Mun.Models
 {
+
     public class ProductModel
     {
         /// <summary>
@@ -13,6 +14,16 @@ namespace WebApi_Mun.Models
         /// </summary>
         public int? ProductId { get; set; }
 
+        /// <summary>
+        /// Identificador nombre dle producto
+        /// </summary>
+        public string Name { get; set; }
+
+
+        /// <summary>
+        /// Identificador descripcion
+        /// </summary>
+        public string Description { get; set; }
 
         /// <summary>
         /// Identificador Categoria
@@ -20,43 +31,8 @@ namespace WebApi_Mun.Models
         [Required]
         public int CategoryId { get; set; }
 
-        /// <summary>
-        /// Identificador usuario al cual pertenece
-        /// </summary>
-        [Required]
-        public int UserId { get; set; }
 
-        /// <summary>
-        /// Estado
-        /// </summary>
-        [Required]
-        public bool State { get; set; }
-
-        /// <summary>
-        /// Titulo
-        /// </summary>
-        [Required]
-        public string Title { get; set; }
-
-        /// <summary>
-        /// Titulo
-        /// </summary>
-        public string Subtitle { get; set; }
-
-        /// <summary>
-        /// Descripcion
-        /// </summary>
-        public string Description { get; set; }
-
-        /// <summary>
-        /// Imagen
-        /// </summary>
-        public string NameImage { get; set; }
-
-        /// <summary>
-        /// Fecha publicacion
-        /// </summary>
-        public DateTime CreatedOn { get; set; }
+        public int MarcaId { get; set; }
 
         /// <summary>
         /// Precio
@@ -65,14 +41,103 @@ namespace WebApi_Mun.Models
         public double Price { get; set; }
 
         /// <summary>
+        /// Codigo descuento
+        /// </summary>
+        public int Discount { get; set; }
+
+        /// <summary>
+        /// Estado
+        /// </summary>
+        [Required]
+        public bool State { get; set; }
+
+
+        /// <summary>
         /// Destacado
         /// </summary>
         [Required]
         public bool Featured { get; set; }
 
+
         /// <summary>
-        /// Promocion del producto
+        /// usuario vinculado
         /// </summary>
-        public string Promotion { get; set; }
+        public int CreatedBy { get; set; }
+
+
+    }
+
+    public class ProductModelDto
+    {
+        /// <summary>
+        /// Identificador producto
+        /// </summary>
+        public int? ProductId { get; set; }
+
+        /// <summary>
+        /// Identificador nombre dle producto
+        /// </summary>
+        public string Name { get; set; }
+
+
+        /// <summary>
+        /// Identificador descripcion
+        /// </summary>
+        public string Description { get; set; }
+
+        /// <summary>
+        /// Identificador Categoria
+        /// </summary>
+        [Required]
+        public int CategoryId { get; set; }
+
+        [Required]
+        public string CategoryName { get; set; }
+
+        [Required]
+        public int MarcaId { get; set; }
+
+        public string MarcaName { get; set; }
+
+        /// <summary>
+        /// Precio
+        /// </summary>
+        [Required]
+        public double Price { get; set; }
+
+        /// <summary>
+        /// Codigo descuento
+        /// </summary>
+        public int Discount { get; set; }
+
+        /// <summary>
+        /// monto descuento
+        /// </summary>
+        public double DiscountAmount { get; set; }
+
+        /// <summary>
+        /// Estado
+        /// </summary>
+        [Required]
+        public bool State { get; set; }
+
+
+        /// <summary>
+        /// Destacado
+        /// </summary>
+        [Required]
+        public bool Featured { get; set; }
+
+
+        /// <summary>
+        /// usuario vinculado
+        /// </summary>
+        public int CreatedBy { get; set; }
+
+        /// <summary>
+        /// Imagenes Vinculadas
+        /// </summary>
+        public List<ProductImageModel> images { get; set; } = new List<ProductImageModel>();
+
     }
 }

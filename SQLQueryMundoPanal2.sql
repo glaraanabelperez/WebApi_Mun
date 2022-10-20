@@ -1,9 +1,7 @@
  use master 
- alter database MundoPanal set single_user with rollback immediate
-
-
-IF EXISTS (SELECT name FROM master.dbo.sysdatabases WHERE name = N'MundoPanal')
-DROP DATABASE MundoPanal
+ 
+IF EXISTS (SELECT name FROM master.dbo.sysdatabases WHERE name = N'MundoPanal2')
+DROP DATABASE MundoPanal2
 GO
 
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_Product_Category]') 
@@ -16,32 +14,40 @@ and OBJECTPROPERTY(id, N'IsForeignKey') = 1)
 ALTER TABLE [dbo].[Product] DROP CONSTRAINT FK_Product_Discount
 GO
 
-if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_ProductImage_1]') 
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_Product_Marca]') 
 and OBJECTPROPERTY(id, N'IsForeignKey') = 1)
-ALTER TABLE [dbo].[Product] DROP CONSTRAINT FK_ProductImage_1
+ALTER TABLE [dbo].[Product] DROP CONSTRAINT FK_Product_Marca
 GO
 
-if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_ProductImage_2]') 
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_Product_User]') 
 and OBJECTPROPERTY(id, N'IsForeignKey') = 1)
-ALTER TABLE [dbo].[Product] DROP CONSTRAINT FK_ProductImage_2
+ALTER TABLE [dbo].[Product] DROP CONSTRAINT FK_Product_User
+GO
+
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_ProductImage_Produc]') 
+and OBJECTPROPERTY(id, N'IsForeignKey') = 1)
+ALTER TABLE [dbo].ProductImage DROP CONSTRAINT FK_ProductImage_Produc
+GO
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_ProductImage_Image]') 
+and OBJECTPROPERTY(id, N'IsForeignKey') = 1)
+ALTER TABLE [dbo].ProductImage DROP CONSTRAINT FK_ProductImage_Image
 GO
 
 
-if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_ProductImage_3]') 
-and OBJECTPROPERTY(id, N'IsForeignKey') = 1)
-ALTER TABLE [dbo].[Product] DROP CONSTRAINT FK_ProductImage_3
-GO
 
-
-
-
-CREATE DATABASE MundoPanal
+CREATE DATABASE MundoPanal2
  COLLATE SQL_Latin1_General_CP1_CI_AS
 GO
 
+-- IF EXISTS (SELECT name FROM master.dbo.sysdatabases WHERE name = N'MundoPanal2')
+--alter database MundoPanal2 set single_user with rollback immediate
+--GO
+
+
+
 ----------------------------------------------------Init
 
-use MundoPanal
+use MundoPanal2
 GO
 DECLARE @Error int
 BEGIN TRAN
@@ -63,10 +69,7 @@ CREATE TABLE [dbo].Products (
 	DiscountId_FK int NULL ,
 	[State] tinyint  NOT NULL ,
 	Featured tinyint  NOT NULL,
-	CreatedBy_Fk int not null,
-	ImageId_1 int null, 
-	ImageId_2 int null,
-	ImageId_3 int null
+	CreatedBy_Fk int not null
 
 ) ON [PRIMARY] 
 GO
@@ -93,6 +96,13 @@ GO
 CREATE TABLE [dbo].Images (
 	ImageId [int] IDENTITY (1, 1) NOT NULL ,
 	[Name] varchar (150) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
+) ON [PRIMARY] 
+GO
+
+CREATE TABLE [dbo].ProductImage (
+	ProductImageId int IDENTITY (1, 1) NOT NULL ,
+	ImageId_FK [int]  NOT NULL ,
+	ProductId_FK [int]  NOT NULL ,
 ) ON [PRIMARY] 
 GO
 
@@ -127,6 +137,12 @@ ALTER TABLE [dbo].Images WITH NOCHECK ADD
 	CONSTRAINT [PK_Image] PRIMARY KEY   
 	( ImageId)  ON [PRIMARY] 
 GO
+
+ALTER TABLE [dbo].ProductImage WITH NOCHECK ADD 
+	CONSTRAINT [PK_ProductImage] PRIMARY KEY   
+	( ProductImageId)  ON [PRIMARY] 
+GO
+
 
 
 --FK
@@ -166,31 +182,25 @@ ALTER TABLE [dbo].Products ADD
 	)
 GO
 
-ALTER TABLE [dbo].Products ADD 
-	CONSTRAINT [FK_ProductImage_1] FOREIGN KEY 
+ALTER TABLE [dbo].ProductImage ADD 
+	CONSTRAINT [FK_ProductImage_Produc] FOREIGN KEY 
 	(
-		ImageId_1
-	) REFERENCES [dbo].Images (
-		ImageId
-	)
-GO
-ALTER TABLE [dbo].Products ADD 
-	CONSTRAINT [FK_ProductImage_2] FOREIGN KEY 
-	(
-		ImageId_2
-	) REFERENCES [dbo].Images (
-		ImageId
-	)
-GO
-ALTER TABLE [dbo].Products ADD 
-	CONSTRAINT [FK_ProductImage_3] FOREIGN KEY 
-	(
-		ImageId_3
-	) REFERENCES [dbo].Images (
-		ImageId
+		ProductId_FK
+
+	) REFERENCES [dbo].Products (
+		productId
 	)
 GO
 
+ALTER TABLE [dbo].ProductImage ADD 
+	CONSTRAINT [FK_ProductImage_Image] FOREIGN KEY 
+	(
+		ImageId_FK
+
+	) REFERENCES [dbo].Images (
+		ImageId
+	)
+GO
 
 
 

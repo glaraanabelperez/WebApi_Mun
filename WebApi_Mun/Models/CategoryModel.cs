@@ -8,12 +8,6 @@ namespace WebApi_Mun.Models
 {
     public class CategoryModel
     {
-        /// <summary>
-        /// Identificador producto
-        /// </summary>
-        [Required]
-        public int UserId { get; set; }
-
 
         /// <summary>
         /// Identificador Categoria
@@ -23,10 +17,10 @@ namespace WebApi_Mun.Models
 
 
         /// <summary>
-        /// Descripcion
+        /// Nombre
         /// </summary>
         [Required]
-        public string Description { get; set; }
+        public string Name { get; set; }
 
     }
 }

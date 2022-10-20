@@ -19,20 +19,20 @@ namespace WebApi_Mun.Controllers
         [HttpGet]
         public IHttpActionResult Get(int productId)
         {
-            try
-            {
-                //List<ProductModel> orderDToList;
-                ProductModel orderDToList = Data.Product.Get(productId);
-                if (orderDToList == null)
-                {
-                    return Content(HttpStatusCode.NotFound, "La solicitud no arroja resultados");
-                }
-                return Ok(orderDToList);
-            }
-            catch (Exception ex)
-            {
-                return Content(HttpStatusCode.InternalServerError, ex.Message);
-            }
+            //try
+            //{
+            //    //List<ProductModel> orderDToList;
+            //    ProductModel orderDToList = Data.Product.Get(productId);
+            //    if (orderDToList == null)
+            //    {
+            //        return Content(HttpStatusCode.NotFound, "La solicitud no arroja resultados");
+            //    }
+               return Ok();
+            //}
+            //catch (Exception ex)
+            //{
+            //    return Content(HttpStatusCode.InternalServerError, ex.Message);
+            //}
         }
 
 
@@ -45,8 +45,10 @@ namespace WebApi_Mun.Controllers
         //[Authorize(Roles = "Admin")]
         public DataTableModel List([FromBody] QueryDataModel<Data.Product.Filter, Data.Product.OrderFields> queryData)
         {
+    
             //try catch
             var objList = Data.Product.List(queryData.OrderField, queryData.OrderAsc, queryData.Filter, queryData.From, queryData.Length, out int RecordCount);
+
             return (new DataTableModel()
             {
                 RecordsCount = RecordCount,
@@ -63,11 +65,11 @@ namespace WebApi_Mun.Controllers
         [HttpPost]
         public IHttpActionResult Insert([FromBody] ProductModel data)
         {
-            var userItem = Data.Product.Save(null, data);
-            if (userItem != -1)
-            {
-                return NotFound();
-            }
+            //var userItem = Data.Product.Save(null, data);
+            //if (userItem != -1)
+            //{
+            //    return NotFound();
+            //}
             return Ok();
         }
 
@@ -76,9 +78,9 @@ namespace WebApi_Mun.Controllers
         public IHttpActionResult Update(int productId, [FromBody] ProductModel data)
         {
   
-           var prod = Data.Product.Save(productId, data);
-           if (prod == -2)
-               return Content(HttpStatusCode.BadRequest, "Los datos solicitados no existen");
+           //var prod = Data.Product.Save(productId, data);
+           //if (prod == -2)
+           //    return Content(HttpStatusCode.BadRequest, "Los datos solicitados no existen");
 
            return Ok();
 
@@ -92,10 +94,10 @@ namespace WebApi_Mun.Controllers
         [HttpDelete]
         public IHttpActionResult Delete(int productId) {
 
-                var prod = Data.Product.Delete(productId);
+                //var prod = Data.Product.Delete(productId);
 
-                if (prod == -2)
-                    return Content(HttpStatusCode.BadRequest, "Los datos solicitados no existen");
+                //if (prod == -2)
+                //    return Content(HttpStatusCode.BadRequest, "Los datos solicitados no existen");
 
                 return Ok();
 
