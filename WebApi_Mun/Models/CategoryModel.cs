@@ -12,15 +12,18 @@ namespace WebApi_Mun.Models
         /// <summary>
         /// Identificador Categoria
         /// </summary>
-        [Required]
         public int? CategoryId { get; set; }
 
 
         /// <summary>
         /// Nombre
         /// </summary>
-        [Required]
         public string Name { get; set; }
+
+        /// <summary>
+        /// Nombre
+        /// </summary>
+        public bool State { get; set; }
 
     }
 }

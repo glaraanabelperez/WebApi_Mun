@@ -45,15 +45,9 @@ namespace WebApi_Mun.Controllers
         //[Authorize(Roles = "Admin")]
         public DataTableModel List([FromBody] QueryDataModel<Data.Product.Filter, Data.Product.OrderFields> queryData)
         {
-    
-            //try catch
-            var objList = Data.Product.List(queryData.OrderField, queryData.OrderAsc, queryData.Filter, queryData.From, queryData.Length, out int RecordCount);
 
-            return (new DataTableModel()
-            {
-                RecordsCount = RecordCount,
-                Data = objList
-            });
+            return Data.Product.List(queryData.OrderField, queryData.OrderAsc, queryData.Filter, queryData.From, queryData.Length, out int RecordCount);
+
         }
 
         /// <summary>

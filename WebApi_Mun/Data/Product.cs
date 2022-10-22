@@ -12,7 +12,7 @@ namespace WebApi_Mun.Data
 {
     public class Product
     {
-        internal static string connectionString = ConfigurationManager.ConnectionStrings["MenuConnection"].ConnectionString;
+        internal static string connectionString = ConfigurationManager.ConnectionStrings["MundoConnection"].ConnectionString;
       
         #region consulta
 
@@ -49,7 +49,6 @@ namespace WebApi_Mun.Data
             /// Filtro para el campo "Destacados"
             /// </summary>
             public bool? Featured { get; set; }
-
 
             /// <summary>
             /// Búsqueda por texto libre
@@ -98,7 +97,7 @@ namespace WebApi_Mun.Data
         /// <param name="filter">Filtros a utilizar</param>
         /// <param name="recordCount">Cantidad de registros encontrados con los filtros establecidos</param>
         /// <returns>Registros obtenidos con los filtros y orden seleccionados</returns>
-        public static DataTable List(OrderFields? orderField, bool? orderAscendant, Filter filter, int? from, int? length, out int recordCount){
+        public static DataTableModel List(OrderFields? orderField, bool? orderAscendant, Filter filter, int? from, int? length, out int recordCount){
 
             if (from.HasValue != length.HasValue)
                 throw new ArgumentOutOfRangeException(nameof(from));
@@ -116,7 +115,6 @@ namespace WebApi_Mun.Data
             {
               SqlCommand objSqlCmd = new SqlCommand("", connection);
               
-              //Agregando parametros
               string strFilter = string.Empty;
               if (filter != null)
                     {
@@ -157,109 +155,74 @@ namespace WebApi_Mun.Data
               objSqlCmd.CommandType = CommandType.Text;
 
               connection.Open();
-              
-              if (from.HasValue)
-                    {
-                        strWithParams += string.Format(OFFSET, from, length);
 
-                        objSqlCmd.CommandText = SELECTCOUNT + strFilter + strWithParams;
+                if (from.HasValue)
+                {
+                    strWithParams += string.Format(OFFSET, from, length);
+
+                    objSqlCmd.CommandText = SELECTCOUNT + strFilter + strWithParams;
 #if DEBUG
-                        System.Diagnostics.Trace.WriteLine(objSqlCmd.CommandText);
+                    System.Diagnostics.Trace.WriteLine(objSqlCmd.CommandText);
+#endif
+                }
+                else
+                {
+                    objSqlCmd.CommandText = strWithParams;
+                    recordCount = -1;
+#if DEBUG
+                    System.Diagnostics.Trace.WriteLine(strWithParams);
 #endif
 
-                        SqlDataAdapter adapter = new SqlDataAdapter();
-                        adapter.SelectCommand = objSqlCmd;
+                }
 
-                        DataSet dataset = new DataSet();
-                        adapter.Fill(dataset);
-                        
-                        recordCount = (int)dataset.Tables[0].Rows[0][0];
+                SqlDataAdapter adapter = new SqlDataAdapter();
+                adapter.SelectCommand = objSqlCmd;
 
+                DataSet dataset = new DataSet();
+                adapter.Fill(dataset);
 
-                    List<ProductModelDto> productList = new List<ProductModelDto>();
-                    foreach (DataRow row in dataset.Tables[1].Rows)
-                    {
+                recordCount = from.HasValue ? (int)dataset.Tables[0].Rows[0][0] : -1;
 
-                        //string valor1 = Convert.ToString(row["columna1"]);
-                        int productId = Convert.ToInt32(row["ProductId"]);
-                        if (productList.Exists(p => p.ProductId == productId)==true)
-                        {
-                            ProductImageModel im = new ProductImageModel();
-                            im.ProductImageId = Convert.ToInt32(row["ProductImageId"]);
+                //lista para devolver los datos mapeados ProductModelList
+                List<ProductModelDto> productList = new List<ProductModelDto>();
 
-                            productList.Find(p => p.ProductId == productId).images.Add(im);
-                        }
-                        else
-                        {
+                 
+                 foreach (DataRow row in dataset.Tables[1].Rows)
+                 {
+                     ProductImageModel im = new ProductImageModel();
+                         im.ProductImageId = Convert.ToInt32(row["ProductImageId"]);
+                         im.ProductId = Convert.ToInt32(row["ProductId"]);
+                         im.ImageId = Convert.ToInt32(row["ImageId "]);
+                         im.Name = Convert.ToString(row["ImageId "]);
 
-                            ProductImageModel im = new ProductImageModel();
-                            im.ProductImageId = Convert.ToInt32(row["ProductImageId"]);
-
-                            ProductModelDto product = new ProductModelDto();
-                            product.ProductId = productId;
+                     if (productList.Exists(p => p.ProductId == Convert.ToInt32(row["ProductId"])) == true)
+                     {
+                         productList.Find(p => p.ProductId == Convert.ToInt32(row["ProductId"])).images.Add(im);
+                     }
+                     else
+                     {
+                        ProductModelDto product = new ProductModelDto();
+                            product.ProductId = Convert.ToInt32(row["ProductId"]);
+                            product.Name= Convert.ToString(row["Name "]);
+                            product.Description= Convert.ToString(row["Description "]);
+                            product.CategoryName= Convert.ToString(row["CategoryName "]);
+                            product.MarcaName= Convert.ToString(row["MarcaName "]);
+                            product.DiscountAmount= Convert.ToDouble(row["DiscountAmount "]);
+                            product.State= Convert.ToBoolean(row["State "]);
+                            product.Featured= Convert.ToBoolean(row["Featured "]);
                             product.images.Add(im);
                             productList.Add(product);
-                        }
+                     }
 
-                    }
+                 }             
 
-
-                    //SqlDataReader reader = objSqlCmd.ExecuteReader();
-
-                    //using (reader)
-                    //{
-                    //    while (reader.Read())
-                    //    {
-                    //        if (!productList.Exists(p => p.ProductId == (int)reader["ProductId"]))
-                    //        {
-                    //            ProductImageModel im = new ProductImageModel();
-                    //            im.ProductImageId = (int)reader["ProductImageId"];
-                    //            im.ImageId = (int)reader["ImageId"];
-                    //            im.Name = (string)reader["ImageName"];
-                    //            im.ProductId = (int)reader["ProductId"];
-
-                    //            productList.Find(p => p.ProductId == (int)reader["ProductId"]).images.Add(im);
-                    //        }
-                    //        else
-                    //        {
-                                
-                    //            ProductImageModel im = new ProductImageModel();
-                    //                im.ProductImageId = (int)reader["ProductImageId"];
-                    //                im.ImageId = (int)reader["ImageId"];
-                    //                im.Name = (string)reader["ImageName"];
-                    //                im.ProductId = (int)reader["ProductId"];
-
-                    //            ProductModelDto product = new ProductModelDto();
-                    //            product.ProductId = (int)reader["ProductImageId"];
-                    //            product.images.Add(im);
-                    //        }
-                            
-                 
-                    //    }
-                    //}
-
-
-                    connection.Close();
-                    return dataset.Tables[1];
-                    }
-              else
-                    {
-                        objSqlCmd.CommandText = strWithParams;
-                        recordCount = -1;
-#if DEBUG
-                        System.Diagnostics.Trace.WriteLine(strWithParams);
-#endif
-
-                        SqlDataAdapter adapter = new SqlDataAdapter();
-                        adapter.SelectCommand = objSqlCmd;
-
-                        DataSet dataset = new DataSet();
-                        adapter.Fill(dataset);
-
-                        return dataset.Tables[0];
-                    }
-
-
+                 connection.Close();
+                 return (new DataTableModel()
+                     {
+                         RecordsCount = recordCount,
+                         Data = productList
+                     });
+              
                 
             }
              
@@ -289,18 +252,17 @@ namespace WebApi_Mun.Data
                         {
                             return null;
                         }
-   
-                            //items.ProductId = objDR.GetInt32(0);
-                            //items.CategoryId = objDR.GetInt32(1);
-                            //items.UserId = objDR.GetInt32(2);
-                            //items.State = objDR.GetByte(3) == 0 ? false : true;
-                            //items.Title = objDR.GetString(4);
-                            //items.Subtitle = objDR.GetString(5);
-                            //items.Description = objDR.GetString(6);
-                            //items.NameImage = objDR.GetString(7);
-                            //items.Price = (double)objDR.GetDecimal(9);
-                            //items.Featured = objDR.GetByte(10) == 0 ? false : true;
-                            //items.Promotion = objDR.GetString(11);
+
+                        items.ProductId = objDR.GetInt32(0);
+                        items.Name = objDR.GetString(5);
+                        items.Description = objDR.GetString(5);
+                        items.CategoryId = objDR.GetInt32(1);
+                        items.MarcaId = objDR.GetInt32(1);
+                        items.DiscountId = objDR.GetInt32(1);
+                        items.Price = (double)objDR.GetDecimal(9);
+                        items.State = objDR.GetByte(3) == 0 ? false : true;                               
+                        items.Featured = objDR.GetByte(10) == 0 ? false : true;
+                        items.CreatedBy = objDR.GetInt32(2);
 
                         return items;
                     }
@@ -324,9 +286,7 @@ namespace WebApi_Mun.Data
         public static int Save(int? productId, ProductModel data)
         {
             using (var connection = new SqlConnection(connectionString))
-            {
-
-                
+            {   
                 var store = "";
                 if (productId.HasValue && productId.Value != 0)
                     store = "Product_Update";
@@ -335,19 +295,18 @@ namespace WebApi_Mun.Data
 
                  using(SqlCommand objCmd = new SqlCommand(store, connection))
                 {
-                    //if (store.Equals("Product_Update"))
-                    //    objCmd.Parameters.Add("@ProductId", SqlDbType.Int).Value = productId;
-                    //objCmd.CommandType = CommandType.StoredProcedure;
-                    //objCmd.Parameters.Add("@UserId", SqlDbType.Int).Value = data.UserId;
-                    //objCmd.Parameters.Add("@CategoryId", SqlDbType.Int).Value = data.CategoryId;
-                    //objCmd.Parameters.Add("@Title", SqlDbType.VarChar, 250).Value = data.Title;
-                    //objCmd.Parameters.Add("@SubTitle", SqlDbType.VarChar, 250).Value = data.Subtitle;
-                    //objCmd.Parameters.Add("@Description", SqlDbType.VarChar, 250).Value = data.Description;
-                    //objCmd.Parameters.Add("@Featured", SqlDbType.TinyInt).Value = (data.Featured == true ? 1 : 0);
-                    //objCmd.Parameters.Add("@NameImage", SqlDbType.VarChar, 250).Value = data.NameImage;
-                    //objCmd.Parameters.Add("@Price", SqlDbType.Money).Value = data.Price;
-                    //objCmd.Parameters.Add("@Promotion", SqlDbType.VarChar, 250).Value = data.Promotion;
-                    //objCmd.Parameters.Add("@State", SqlDbType.TinyInt).Value = (data.State == true ? 1 : 0);
+                    if (store.Equals("Product_Update"))
+                        objCmd.Parameters.Add("@ProductId", SqlDbType.Int).Value = productId;
+                    objCmd.CommandType = CommandType.StoredProcedure;
+                    objCmd.Parameters.Add("@CategoryId", SqlDbType.Int).Value = data.CategoryId;
+                    objCmd.Parameters.Add("@MarcaId", SqlDbType.Int).Value = data.MarcaId;
+                    objCmd.Parameters.Add("@DiscountId", SqlDbType.Int).Value = data.DiscountId;
+                    objCmd.Parameters.Add("@Name", SqlDbType.VarChar, 250).Value = data.Name;
+                    objCmd.Parameters.Add("@Description", SqlDbType.VarChar, 250).Value = data.Description;
+                    objCmd.Parameters.Add("@Featured", SqlDbType.TinyInt).Value = (data.Featured == true ? 1 : 0);
+                    objCmd.Parameters.Add("@State", SqlDbType.TinyInt).Value = (data.State == true ? 1 : 0);
+                    objCmd.Parameters.Add("@Price", SqlDbType.Money).Value = data.Price;
+
 
                     connection.Open();
                     var result = objCmd.ExecuteNonQuery();
@@ -363,12 +322,12 @@ namespace WebApi_Mun.Data
         /// Elimina un producto
         /// </summary>
         /// <returns>Retorna 0</returns>
-        public static int Delete(int productId)
+        public static int Disable(int productId)
         {
             using (var connection = new SqlConnection(connectionString))
             {
 
-                using (SqlCommand objCmd = new SqlCommand("Product_Delete", connection))
+                using (SqlCommand objCmd = new SqlCommand("[Product_Disable]", connection))
                 {
                     objCmd.CommandType = CommandType.StoredProcedure;
                     objCmd.Parameters.Add("@ProductId", SqlDbType.Int).Value = productId;
@@ -383,22 +342,6 @@ namespace WebApi_Mun.Data
 
 
 
-        //private const string SELECT_ALL =
-        //";SELECT A.ProductId, A.[Name],  A.[Description], " +
-        //    " A.CategoryId_FK as CategoryId, o.[Name] as CategoryName, A.MarcaId_FK as MarcaId, mar.[Name] " +
-        //    " A.Price, A.DiscountId_FK, dis.[Name], A.State, A.Featured, A.ImageId_1, im.[Name] as Image1 " +
-        //    " A.ImageId_2, im.[Name]" +
-        //    " A.NameImage, A.Price as Price ,A.Promotion, A.State" +
-        //    ", U.Business_Name as Buisness,  A.Featured as Featured," +
-        //    " FROM Products AS A " +
-        //    " INNER JOIN dbo.[Users] U ON U.UserId = A.UserId_FK " +
-        //    " INNER JOIN dbo.Categories O ON O.CategoryId = A.CategoryId_FK " +
-        //    " INNER JOIN [dbo].[Marcas] mar on A.MarcaId_FK= mar.MarcaId" +
-        //    " left JOIN [dbo].[Discounts] dis on A.DiscountId_FK= dis.DiscountId" +
-        //    " left JOIN [dbo].[Images] im on A.ImageId= A.ImageId_1" +
-        //    " and im.ImageId= A.ImageId_2 and im.ImageId= A.ImageId_3" +
-        //    " {2} " +
-        //    " ORDER BY {0} {1} ";
 
     }
 }

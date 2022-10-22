@@ -12,7 +12,7 @@ namespace WebApi_Mun.Data
 {
     public class Category
     {
-        static string connectionString = ConfigurationManager.ConnectionStrings["MenuConnection"].ConnectionString;
+        static string connectionString = ConfigurationManager.ConnectionStrings["MundoConnection"].ConnectionString;
 
         /// <summary>
         /// Devuelve todos las categorias d eun usuario

@@ -11,12 +11,12 @@ namespace WebApi_Mun.Controllers
     [EnableCors(origins: "http://localhost:4200", headers: "*", methods: "*")]
     public class CategoryController : ApiController
     {
-        public Product product = new Product();
+        public Category product = new Category();
 
         /// <summary>
         /// Listado de todas las categorias segun usuario
         /// </summary>
-        [Route("api/category/list/{userId}")]
+        [Route("api/category/list/")]
         [HttpGet]
         public IHttpActionResult GetAll(int userId)
         {
@@ -74,20 +74,6 @@ namespace WebApi_Mun.Controllers
             return Ok();
         }
 
-        /// <summary>
-        /// Elimina un catgeoria
-        /// </summary>
-        /// <param name="catgeoriaId"> Identificador del catgeoria</param>
-        [HttpDelete]
-        public IHttpActionResult Delete(int catgeoria)
-        {
-            var userItem = Data.Category.Delete(catgeoria);
-            if (userItem != 0)
-            {
-                return NotFound();
-            }
-            return Ok();
-        }
 
     }
 }

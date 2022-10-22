@@ -19,7 +19,6 @@ namespace WebApi_Mun.Models
         /// </summary>
         public string Name { get; set; }
 
-
         /// <summary>
         /// Identificador descripcion
         /// </summary>
@@ -28,36 +27,32 @@ namespace WebApi_Mun.Models
         /// <summary>
         /// Identificador Categoria
         /// </summary>
-        [Required]
-        public int CategoryId { get; set; }
+        public int? CategoryId { get; set; }
 
-
-        public int MarcaId { get; set; }
+        /// <summary>
+        /// Id marca
+        /// </summary>
+        public int? MarcaId { get; set; }
 
         /// <summary>
         /// Precio
         /// </summary>
-        [Required]
-        public double Price { get; set; }
+        public double? Price { get; set; }
 
         /// <summary>
         /// Codigo descuento
         /// </summary>
-        public int Discount { get; set; }
+        public int? DiscountId { get; set; }
 
         /// <summary>
         /// Estado
         /// </summary>
-        [Required]
-        public bool State { get; set; }
-
+        public bool? State { get; set; }
 
         /// <summary>
         /// Destacado
         /// </summary>
-        [Required]
-        public bool Featured { get; set; }
-
+        public bool? Featured { get; set; }
 
         /// <summary>
         /// usuario vinculado
@@ -79,60 +74,35 @@ namespace WebApi_Mun.Models
         /// </summary>
         public string Name { get; set; }
 
-
         /// <summary>
-        /// Identificador descripcion
+        /// descripcion
         /// </summary>
         public string Description { get; set; }
 
-        /// <summary>
-        /// Identificador Categoria
-        /// </summary>
-        [Required]
-        public int CategoryId { get; set; }
 
-        [Required]
+        /// <summary>
+        /// Nombre Categoria
+        /// </summary>
         public string CategoryName { get; set; }
 
-        [Required]
-        public int MarcaId { get; set; }
-
+        /// <summary>
+        /// Nombre marca
+        /// </summary>
         public string MarcaName { get; set; }
-
-        /// <summary>
-        /// Precio
-        /// </summary>
-        [Required]
-        public double Price { get; set; }
-
-        /// <summary>
-        /// Codigo descuento
-        /// </summary>
-        public int Discount { get; set; }
 
         /// <summary>
         /// monto descuento
         /// </summary>
-        public double DiscountAmount { get; set; }
-
+        public double? DiscountAmount { get; set; }
         /// <summary>
         /// Estado
         /// </summary>
-        [Required]
-        public bool State { get; set; }
-
+        public bool? State { get; set; }
 
         /// <summary>
         /// Destacado
         /// </summary>
-        [Required]
-        public bool Featured { get; set; }
-
-
-        /// <summary>
-        /// usuario vinculado
-        /// </summary>
-        public int CreatedBy { get; set; }
+        public bool? Featured { get; set; }
 
         /// <summary>
         /// Imagenes Vinculadas

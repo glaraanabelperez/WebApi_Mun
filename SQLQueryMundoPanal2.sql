@@ -77,19 +77,22 @@ GO
 CREATE TABLE [dbo].Marcas (
 	MarcaId [int] IDENTITY (1, 1) NOT NULL ,
 	[Name] varchar (150) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
+	[State] tinyint null
 ) ON [PRIMARY] 
 GO
 
 CREATE TABLE [dbo].Discounts (
 	DiscountId [int] IDENTITY (1, 1) NOT NULL ,
 	[Amount] decimal NOT NULL ,
-	CreatedBy int not null
+	CreatedBy int not null,
+	[State] tinyint null
 ) ON [PRIMARY] 
 GO
 
 CREATE TABLE [dbo].Categories (
 	CategoryId [int] IDENTITY (1, 1) NOT NULL ,
 	[Name] varchar (150) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
+	[State] tinyint null
 ) ON [PRIMARY] 
 GO
 
@@ -209,8 +212,20 @@ GO
 --ADD CONSTRAINT 
 --   CHK_email CHECK (user_email like '%_@__%.__%')
 
+
 ALTER TABLE [dbo].Products WITH NOCHECK ADD 
 	CONSTRAINT Price_check DEFAULT (0) FOR Price
+GO
+ALTER TABLE [dbo].Categories WITH NOCHECK ADD 
+	CONSTRAINT category_State DEFAULT (1) FOR [State]
+GO
+
+ALTER TABLE [dbo].MarcasWITH NOCHECK ADD 
+	CONSTRAINT Marca_State DEFAULT (1) FOR [State]
+GO
+
+ALTER TABLE [dbo].Discounts WITH NOCHECK ADD 
+	CONSTRAINT Discount_State DEFAULT (1) FOR [State]
 GO
 --SET @Error=@@ERROR
 
