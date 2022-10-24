@@ -11,7 +11,7 @@ namespace WebApi_Mun.Controllers
     [EnableCors(origins: "http://localhost:4200", headers: "*", methods: "*")]
     public class UserController : ApiController
     {
-        public User user = new User();
+        public UserLogic user = new UserLogic();
 
         /// <summary>
         /// Listado de todos los useros 
@@ -106,7 +106,7 @@ namespace WebApi_Mun.Controllers
         public IHttpActionResult Delete(int userId)
         {
 
-           var result = Data.User.Delete(userId);
+           var result = Data.UserLogic.Delete(userId);
 
                if (result == -2)
                    return Content(HttpStatusCode.BadRequest, "Los datos solicitados no existen");

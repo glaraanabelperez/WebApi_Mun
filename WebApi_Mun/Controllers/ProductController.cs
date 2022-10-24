@@ -4,7 +4,7 @@ using System.Net;
 using System.Web.Http;
 using System.Web.Http.Cors;
 using WebApi_Mun.Models;
-using static WebApi_Mun.Data.Product;
+using static WebApi_Mun.Data.ProductLogic;
 
 namespace WebApi_Mun.Controllers
 {
@@ -43,10 +43,10 @@ namespace WebApi_Mun.Controllers
         /// <returns>Listado de los productos</returns>
         [HttpPost]
         //[Authorize(Roles = "Admin")]
-        public DataTableModel List([FromBody] QueryDataModel<Data.Product.Filter, Data.Product.OrderFields> queryData)
+        public DataTableModel List([FromBody] QueryDataModel<Data.ProductLogic.Filter, Data.ProductLogic.OrderFields> queryData)
         {
 
-            return Data.Product.List(queryData.OrderField, queryData.OrderAsc, queryData.Filter, queryData.From, queryData.Length, out int RecordCount);
+            return Data.ProductLogic.List(queryData.OrderField, queryData.OrderAsc, queryData.Filter, queryData.From, queryData.Length, out int RecordCount);
 
         }
 

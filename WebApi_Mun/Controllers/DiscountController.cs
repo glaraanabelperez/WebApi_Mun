@@ -9,9 +9,9 @@ using WebApi_Mun.Models;
 namespace WebApi_Mun.Controllers
 {
     [EnableCors(origins: "http://localhost:4200", headers: "*", methods: "*")]
-    public class CategoryController : ApiController
+    public class DiscountController : ApiController
     {
-        public CategoryLogic product = new CategoryLogic();
+        public Discount model = new Discount();
 
         /// <summary>
         /// Listado de todas las categorias segun usuario

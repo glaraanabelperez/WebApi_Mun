@@ -6,13 +6,13 @@ using System.Web;
 
 namespace WebApi_Mun.Models
 {
-    public class ImagesModel
+    public class DiscountModel
     {
 
         /// <summary>
-        /// Identificador Imagen
+        /// Identificador descuento
         /// </summary>
-        public int? ImageId { get; set; }
+        public int? DiscountId { get; set; }
 
 
         /// <summary>
@@ -20,6 +20,10 @@ namespace WebApi_Mun.Models
         /// </summary>
         public string Name { get; set; }
 
+        /// <summary>
+        /// Nombre
+        /// </summary>
+        public bool State { get; set; }
 
     }
 }

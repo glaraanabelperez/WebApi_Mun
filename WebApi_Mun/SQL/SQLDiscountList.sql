@@ -4,10 +4,7 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 
-alter PROCEDURE DiscountUpdate
-@DiscountId int,
-@Amount int=null,
-@State varchar (250) =null
+CREATE PROCEDURE Discount_List
 
 AS
 BEGIN
@@ -16,9 +13,6 @@ BEGIN
 	SET NOCOUNT ON;
 
     -- Insert statements for procedure here
-	Update Discounts set 
-		@Amount=IsNull(@Amount, Amount),
-		 @State=IsNull(@State, [State])		 
-		 where DiscountId=@DiscountId
+	SELECT * from Discounts 
 END
 GO

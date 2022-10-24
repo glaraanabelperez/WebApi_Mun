@@ -10,7 +10,7 @@ using WebApi_Mun.Models;
 
 namespace WebApi_Mun.Data
 {
-    public class Product
+    public class ProductLogic
     {
         internal static string connectionString = ConfigurationManager.ConnectionStrings["MundoConnection"].ConnectionString;
       
@@ -317,29 +317,6 @@ namespace WebApi_Mun.Data
             }
 
         }
-
-        /// <summary>
-        /// Elimina un producto
-        /// </summary>
-        /// <returns>Retorna 0</returns>
-        public static int Disable(int productId)
-        {
-            using (var connection = new SqlConnection(connectionString))
-            {
-
-                using (SqlCommand objCmd = new SqlCommand("[Product_Disable]", connection))
-                {
-                    objCmd.CommandType = CommandType.StoredProcedure;
-                    objCmd.Parameters.Add("@ProductId", SqlDbType.Int).Value = productId;
-
-                    connection.Open();
-                    var result = objCmd.ExecuteNonQuery();
-
-                    return result;
-                }
-            }
-        }
-
 
 
 

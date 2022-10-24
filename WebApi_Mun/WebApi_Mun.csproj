@@ -161,17 +161,24 @@
     <Compile Include="Areas\HelpPage\SampleGeneration\SampleDirection.cs" />
     <Compile Include="Areas\HelpPage\SampleGeneration\TextSample.cs" />
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
+    <Compile Include="Controllers\DiscountController.cs" />
+    <Compile Include="Controllers\MarcaController.cs" />
     <Compile Include="Controllers\CategoryController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ProductController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Controllers\ValuesController.cs" />
-    <Compile Include="Data\Category.cs" />
-    <Compile Include="Data\Product.cs" />
-    <Compile Include="Data\User.cs" />
+    <Compile Include="Data\DiscountLogic.cs" />
+    <Compile Include="Data\MarcaLogic.cs" />
+    <Compile Include="Data\CategoryLogic.cs" />
+    <Compile Include="Data\ProductLogic.cs" />
+    <Compile Include="Data\UserLogic.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\ImagesModel.cs" />
+    <Compile Include="Models\DiscountModel.cs" />
+    <Compile Include="Models\MarcaModel.cs" />
     <Compile Include="Models\CategoryModel.cs" />
     <Compile Include="Models\DataTableModel.cs" />
     <Compile Include="Models\LoginModel.cs" />

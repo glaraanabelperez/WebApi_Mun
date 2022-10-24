@@ -30,4 +30,17 @@ namespace WebApi_Mun.Models
 
        
     }
+
+    public class UserLogin
+    {
+        /// <summary>
+        /// username
+        /// </summary>
+        public string UserName { get; set; }
+
+        /// <summary>
+        /// contraseña del usuario
+        /// </summary>
+        public string Password { get; set; }
+    }
 }
