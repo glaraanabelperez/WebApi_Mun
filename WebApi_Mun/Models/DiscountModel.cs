@@ -18,12 +18,17 @@ namespace WebApi_Mun.Models
         /// <summary>
         /// Nombre
         /// </summary>
-        public string Name { get; set; }
+        public byte Amount { get; set; }
 
         /// <summary>
         /// Nombre
         /// </summary>
         public bool State { get; set; }
+        /// <summary>
+        /// Identificador usuario creador
+        /// </summary>
+        public int? CreatedBy { get; set; }
+
 
     }
 }

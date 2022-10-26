@@ -86,7 +86,7 @@ namespace WebApi_Mun.Data
 
         private const string SELECTCOUNT = "SELECT COUNT(1) AS rows FROM [Products] AS A";
         #endregion
-        
+
         /// <summary>
         /// Obtiene la lista de registros paginada, ordenada y filtrada
         /// </summary>
@@ -97,7 +97,7 @@ namespace WebApi_Mun.Data
         /// <param name="filter">Filtros a utilizar</param>
         /// <param name="recordCount">Cantidad de registros encontrados con los filtros establecidos</param>
         /// <returns>Registros obtenidos con los filtros y orden seleccionados</returns>
-        public static DataTableModel List(OrderFields? orderField, bool? orderAscendant, Filter filter, int? from, int? length, out int recordCount){
+        public DataTableModel List(OrderFields? orderField, bool? orderAscendant, Filter filter, int? from, int? length, out int recordCount){
 
             if (from.HasValue != length.HasValue)
                 throw new ArgumentOutOfRangeException(nameof(from));
@@ -233,7 +233,7 @@ namespace WebApi_Mun.Data
         /// </summary>
         /// <param name="userId">Identificador del producto</param>
         /// <returns>Datos de producto</returns>
-        internal static ProductModel Get(int productId)
+        public ProductModel Get(int productId)
         {
             var items = new ProductModel();
             using (var connection = new SqlConnection(connectionString))
@@ -283,7 +283,7 @@ namespace WebApi_Mun.Data
         /// <param name="data">Datos del prodcuto</param>
         /// <param name="userId">Identificador del usuario que graba</param>
         /// <returns><c>true</c> Si se guardaron los datos, en caso contrario quiere decir que el nombre está repetido</returns>
-        public static int Save(int? productId, ProductModel data)
+        public int Save(int? productId, ProductModel data)
         {
             using (var connection = new SqlConnection(connectionString))
             {   

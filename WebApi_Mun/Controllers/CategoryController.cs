@@ -11,19 +11,20 @@ namespace WebApi_Mun.Controllers
     [EnableCors(origins: "http://localhost:4200", headers: "*", methods: "*")]
     public class CategoryController : ApiController
     {
-        public CategoryLogic product = new CategoryLogic();
+        public CategoryLogic cat = new CategoryLogic();
 
         /// <summary>
         /// Listado de todas las categorias segun usuario
         /// </summary>
         [Route("api/category/list/")]
         [HttpGet]
-        public IHttpActionResult GetAll(int userId)
+        public IHttpActionResult GetAll()
         {
             try
             {
                 //List<ProductModel> orderDToList;
-                var list = Data.CategoryLogic.List(userId);
+                
+                var list = cat.List();
                 return Ok(list);
             }
             catch (Exception ex)
@@ -39,7 +40,7 @@ namespace WebApi_Mun.Controllers
         [HttpGet]
         public IHttpActionResult Get(int categoryId)
         {
-            var userItem = Data.CategoryLogic.Get(categoryId);
+            var userItem = cat.Get(categoryId);
             if (userItem == null)
             {
                 return NotFound();
@@ -55,7 +56,7 @@ namespace WebApi_Mun.Controllers
         [HttpPut]
         public IHttpActionResult Put([FromBody] CategoryModel data)
         {
-            var userItem = Data.CategoryLogic.Save(null, data);
+            var userItem = cat.Save(null, data);
             if (userItem != 0)
             {
                 return NotFound();
@@ -66,7 +67,7 @@ namespace WebApi_Mun.Controllers
         [HttpPost]
         public IHttpActionResult Update(int categoryId, [FromBody] CategoryModel data)
         {
-            var userItem = Data.CategoryLogic.Save(categoryId, data);
+            var userItem = cat.Save(categoryId, data);
             if (userItem != 0)
             {
                 return NotFound();

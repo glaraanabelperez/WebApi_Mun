@@ -11,35 +11,66 @@ namespace WebApi_Mun.Controllers
     [EnableCors(origins: "http://localhost:4200", headers: "*", methods: "*")]
     public class MarcaController : ApiController
     {
-        public MarcaLogic product = new MarcaLogic();
+        public MarcaLogic mar = new MarcaLogic();
 
         /// <summary>
         /// Listado de todas las categorias segun usuario
         /// </summary>
-        [Route("api/category/list/")]
+        [Route("api/marca/list/")]
         [HttpGet]
-        public IHttpActionResult GetAll(int userId)
+        public IHttpActionResult GetAll()
         {
             try
             {
-                //List<ProductModel> orderDToList;
-                var list = Data.CategoryLogic.List(userId);
+                var list = mar.List();
+                if (list == null)
+                {
+                    return NotFound();
+                }
+                
                 return Ok(list);
+            }
+            catch (Exception ex)
+            {
+                return Content(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Listado de todas las categorias segun usuario
+        /// </summary>
+        [Route("api/category/listActive/")]
+        [HttpGet]
+        public IHttpActionResult GetAllActive()
+        {
+            try
+            {
+                var list = mar.ListActive();
+                if (list == null)
+                {
+                    return NotFound();
+                }
+
+                return Ok(list);
+
             }
             catch (Exception ex)
             {
                 return Content(HttpStatusCode.NotFound, ex.Message);
             }
         }
+
+
         /// <summary>
         /// Devuelve los datos de un categoria
         /// </summary>
         /// <param name="categoryId">Identificador del categoria</param>
         /// <returns>Datos del categoria</returns>
+        [Route("api/marca/{marcaId}")]
         [HttpGet]
-        public IHttpActionResult Get(int categoryId)
+        public IHttpActionResult Get(int marcaId)
         {
-            var userItem = Data.CategoryLogic.Get(categoryId);
+            var userItem = mar.Get(marcaId);
             if (userItem == null)
             {
                 return NotFound();
@@ -53,27 +84,49 @@ namespace WebApi_Mun.Controllers
         /// <param name="data">Datos del categoria</param>
         /// <returns><c>true</c> Si se guardaron los datos</returns>
         [HttpPut]
-        public IHttpActionResult Put([FromBody] CategoryModel data)
+        public IHttpActionResult Put([FromBody] MarcaModel data)
         {
-            var userItem = Data.CategoryLogic.Save(null, data);
-            if (userItem != 0)
+            if (data == null || !ModelState.IsValid)
             {
-                return NotFound();
+                return BadRequest("El modelo de datos esta incorrecto o vacio");
             }
-            return Ok();
+            try
+            {
+                var result = mar.Save(null, data);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return Content(HttpStatusCode.InternalServerError, ex.Message);
+            }
+           
         }
 
+        /// <summary>
+        /// Graba los datos del categoria
+        /// </summary>
+        /// <param name="data">Datos del categoria</param>
+        /// <returns><c>true</c> Si se guardaron los datos</returns>
+        [Route("api/marca/{marcaId}")]
         [HttpPost]
-        public IHttpActionResult Update(int categoryId, [FromBody] CategoryModel data)
+        public IHttpActionResult Post(int marcaId, [FromBody] MarcaModel data)
         {
-            var userItem = Data.CategoryLogic.Save(categoryId, data);
-            if (userItem != 0)
+            if (data == null || !ModelState.IsValid )
             {
-                return NotFound();
+                return BadRequest("El modelo de datos esta incorrecto o vacio");
             }
-            return Ok();
-        }
+            try
+            {
+                var result = mar.Save(marcaId, data);
 
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return Content(HttpStatusCode.InternalServerError, ex.Message);
+            }
+
+        }
 
     }
 }

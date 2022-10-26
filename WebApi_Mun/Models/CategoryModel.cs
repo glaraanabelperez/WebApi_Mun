@@ -21,7 +21,7 @@ namespace WebApi_Mun.Models
         public string Name { get; set; }
 
         /// <summary>
-        /// Nombre
+        /// Estado
         /// </summary>
         public bool State { get; set; }
 

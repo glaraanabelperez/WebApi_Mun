@@ -11,26 +11,56 @@ namespace WebApi_Mun.Controllers
     [EnableCors(origins: "http://localhost:4200", headers: "*", methods: "*")]
     public class DiscountController : ApiController
     {
-        public Discount model = new Discount();
+        public DiscountLogic dis = new DiscountLogic();
 
         /// <summary>
         /// Listado de todas las categorias segun usuario
         /// </summary>
-        [Route("api/category/list/")]
+        [Route("api/discount/list/")]
         [HttpGet]
-        public IHttpActionResult GetAll(int userId)
+        public IHttpActionResult GetAll()
         {
             try
             {
-                //List<ProductModel> orderDToList;
-                var list = Data.CategoryLogic.List(userId);
+                var list = dis.List();
+                if (list == null)
+                {
+                    return NotFound();
+                }
+
                 return Ok(list);
+
             }
             catch (Exception ex)
             {
                 return Content(HttpStatusCode.NotFound, ex.Message);
             }
         }
+
+        /// <summary>
+        /// Listado de todas las categorias segun usuario
+        /// </summary>
+        [Route("api/discount/listActive/")]
+        [HttpGet]
+        public IHttpActionResult GetAllActive()
+        {
+            try
+            {
+                var list = dis.ListActive();
+                if (list == null)
+                {
+                    return NotFound();
+                }
+
+                return Ok(list);
+
+            }
+            catch (Exception ex)
+            {
+                return Content(HttpStatusCode.NotFound, ex.Message);
+            }
+        }
+
         /// <summary>
         /// Devuelve los datos de un categoria
         /// </summary>
@@ -39,7 +69,7 @@ namespace WebApi_Mun.Controllers
         [HttpGet]
         public IHttpActionResult Get(int categoryId)
         {
-            var userItem = Data.CategoryLogic.Get(categoryId);
+            var userItem = dis.Get(categoryId);
             if (userItem == null)
             {
                 return NotFound();
@@ -53,27 +83,49 @@ namespace WebApi_Mun.Controllers
         /// <param name="data">Datos del categoria</param>
         /// <returns><c>true</c> Si se guardaron los datos</returns>
         [HttpPut]
-        public IHttpActionResult Put([FromBody] CategoryModel data)
+        public IHttpActionResult Put([FromBody] DiscountModel data)
         {
-            var userItem = Data.CategoryLogic.Save(null, data);
-            if (userItem != 0)
+
+            if (data == null || !ModelState.IsValid)
             {
-                return NotFound();
+                return BadRequest("El modelo de datos esta incorrecto o vacio");
             }
-            return Ok();
+            try
+            {
+                var result = dis.Save(null, data);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return Content(HttpStatusCode.InternalServerError, ex.Message);
+            }
         }
 
+        /// <summary>
+        /// Graba los datos del categoria
+        /// </summary>
+        /// <param name="data">Datos del categoria</param>
+        /// <returns><c>true</c> Si se guardaron los datos</returns>
+        [Route("api/discount/{discountId}")]
         [HttpPost]
-        public IHttpActionResult Update(int categoryId, [FromBody] CategoryModel data)
+        public IHttpActionResult Post(int discountId, [FromBody] DiscountModel data)
         {
-            var userItem = Data.CategoryLogic.Save(categoryId, data);
-            if (userItem != 0)
-            {
-                return NotFound();
-            }
-            return Ok();
-        }
 
+            if (data == null || !ModelState.IsValid || data.DiscountId==null)
+            {
+                return BadRequest("El modelo de datos esta incorrecto o vacio");
+            }
+            try
+            {
+                var result = dis.Save(discountId, data);
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return Content(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
 
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Web.Http;
 using System.Web.Http.Cors;
+using WebApi_Mun.Data;
 using WebApi_Mun.Models;
 using static WebApi_Mun.Data.ProductLogic;
 
@@ -11,6 +12,7 @@ namespace WebApi_Mun.Controllers
     [EnableCors(origins: "http://localhost:4200", headers: "*", methods: "*")]
     public class ProductController : ApiController
     {
+        ProductLogic prodLogic = new ProductLogic();
 
         /// <summary>
         /// Listado de todos los productos 
@@ -19,21 +21,20 @@ namespace WebApi_Mun.Controllers
         [HttpGet]
         public IHttpActionResult Get(int productId)
         {
-            //try
-            //{
-            //    //List<ProductModel> orderDToList;
-            //    ProductModel orderDToList = Data.Product.Get(productId);
-            //    if (orderDToList == null)
-            //    {
-            //        return Content(HttpStatusCode.NotFound, "La solicitud no arroja resultados");
-            //    }
-               return Ok();
-            //}
-            //catch (Exception ex)
-            //{
-            //    return Content(HttpStatusCode.InternalServerError, ex.Message);
-            //}
-        }
+            try
+            {
+                ProductModel prod = prodLogic.Get(productId);
+                if (prod == null)
+                {
+                    return Content(HttpStatusCode.NotFound, "La solicitud no arroja resultados");
+                }
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return Content(HttpStatusCode.InternalServerError, ex.Message);
+            }
+}
 
 
         /// <summary>
@@ -46,7 +47,7 @@ namespace WebApi_Mun.Controllers
         public DataTableModel List([FromBody] QueryDataModel<Data.ProductLogic.Filter, Data.ProductLogic.OrderFields> queryData)
         {
 
-            return Data.ProductLogic.List(queryData.OrderField, queryData.OrderAsc, queryData.Filter, queryData.From, queryData.Length, out int RecordCount);
+            return prodLogic.List(queryData.OrderField, queryData.OrderAsc, queryData.Filter, queryData.From, queryData.Length, out int RecordCount);
 
         }
 
@@ -59,45 +60,28 @@ namespace WebApi_Mun.Controllers
         [HttpPost]
         public IHttpActionResult Insert([FromBody] ProductModel data)
         {
-            //var userItem = Data.Product.Save(null, data);
-            //if (userItem != -1)
-            //{
-            //    return NotFound();
-            //}
-            return Ok();
+            var item = prodLogic.Save(null, data);
+            if (item != -1)
+            {
+                return NotFound();
+            }
+            return Ok(item);
         }
 
         [Route("api/Product/{productId}")]
         [HttpPut]
         public IHttpActionResult Update(int productId, [FromBody] ProductModel data)
         {
-  
-           //var prod = Data.Product.Save(productId, data);
-           //if (prod == -2)
-           //    return Content(HttpStatusCode.BadRequest, "Los datos solicitados no existen");
 
-           return Ok();
+            var prod = prodLogic.Save(productId, data);
+            if (prod == -2)
+                return Content(HttpStatusCode.BadRequest, "Los datos solicitados no existen");
+
+            return Ok(prod);
 
         }
 
-        /// <summary>
-        /// Elimina un producto
-        /// </summary>
-        /// <param name="productoId"> Identificador del producto</param>
-        [Route("api/Product/delete/{productId}")]
-        [HttpDelete]
-        public IHttpActionResult Delete(int productId) {
-
-                //var prod = Data.Product.Delete(productId);
-
-                //if (prod == -2)
-                //    return Content(HttpStatusCode.BadRequest, "Los datos solicitados no existen");
-
-                return Ok();
-
-         }
-
-
-           
+    
   }    
+
 }

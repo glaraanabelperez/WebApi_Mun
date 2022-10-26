@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Runtime.Serialization;
-using System.Web;
+
 using WebApi_Mun.Models;
 
 namespace WebApi_Mun.Data
@@ -18,7 +16,7 @@ namespace WebApi_Mun.Data
         /// Devuelve todos las categorias d eun usuario
         /// </summary>
         /// <returns>Lista de categorias</returns>
-        internal static CategoryModel[] List(int userId)
+        public  CategoryModel[] List()
         {
             var items = new List<CategoryModel>();
             using (var connection = new SqlConnection(connectionString))
@@ -51,7 +49,7 @@ namespace WebApi_Mun.Data
         /// </summary>
         /// <param name="userId">Identificador del categoria</param>
         /// <returns>Datos de categoria</returns>
-        internal static CategoryModel Get(int userId)
+        public  CategoryModel Get(int userId)
         {
             var items = new CategoryModel();
             using (var connection = new SqlConnection(connectionString))
@@ -83,7 +81,7 @@ namespace WebApi_Mun.Data
         /// </summary>
         /// <param name="data">Datos de la categoria</param>
         /// <returns><c>true</c> Si se guardaron los datos</returns>
-        internal static int Save(int? categoryId, CategoryModel data)
+        public int Save(int? categoryId, CategoryModel data)
         {
             using (var connection = new SqlConnection(connectionString))
             {

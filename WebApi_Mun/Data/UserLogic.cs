@@ -10,12 +10,11 @@ using WebApi_Mun.Models;
 
 namespace WebApi_Mun.Data
 {
-    public class UserLogic
+    public  class UserLogic
     {
-        static string connectionString = ConfigurationManager.ConnectionStrings["MenuConnection"].ConnectionString;
+        static string connectionString = ConfigurationManager.ConnectionStrings["MundoConnection"].ConnectionString;
 
-      
-        internal LoginModel Login(LoginModel data)
+        public LoginModel Login(LoginModel data)
         {
             using (var connection = new SqlConnection(connectionString))
             {
@@ -50,7 +49,7 @@ namespace WebApi_Mun.Data
         /// </summary>
         /// <param name="userId">Identificador del usuario</param>
         /// <returns>Datos del usuario</returns>
-        internal  UserModel Get(int userId)
+        public UserModel Get(int userId)
         {
             var items = new UserModel();
             using (var connection = new SqlConnection(connectionString))
@@ -63,15 +62,15 @@ namespace WebApi_Mun.Data
 
                     using (var objDR = command.ExecuteReader(CommandBehavior.SingleRow))
                     {
-
-                        if (!objDR.Read())
-                        {
-                            return null;
-                        }
                         var item = new UserModel();
-                        item.UserName = objDR.GetString(0);
-                        item.Password = DBNull.Value.Equals(objDR.GetValue(1)) ? null : (objDR.GetString(1));
-                      
+                        while (objDR.Read())
+                        {
+                            item.UserId= objDR.GetInt32(0);
+                            item.UserName = objDR.GetString(1);
+                            item.Password = DBNull.Value.Equals(objDR.GetValue(2)) ? null : (objDR.GetString(2));
+
+
+                        }
 
                         return item;
                     }
@@ -87,7 +86,7 @@ namespace WebApi_Mun.Data
         /// <param name="data">Datos del usuario</param>
         /// <param name="userId">Identificador del usuario</param>
         /// <returns><c>true</c> Si se guardaron los datos</returns>
-        internal  int Update(int userId, UserModel data)
+        public int Update(int userId, UserModel data)
         {
             using (var connection = new SqlConnection(connectionString))
             {
@@ -120,7 +119,7 @@ namespace WebApi_Mun.Data
         /// <param name="data">Datos del usuario</param>
         /// <param name="userId">Identificador del usuario</param>
         /// <returns><c>true</c> Si se guardaron los datos</returns>
-        internal int Insert(UserModel data)
+        public int Insert(UserModel data)
         {
             using (var connection = new SqlConnection(connectionString))
             {

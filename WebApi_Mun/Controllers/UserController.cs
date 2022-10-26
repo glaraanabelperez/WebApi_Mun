@@ -13,20 +13,20 @@ namespace WebApi_Mun.Controllers
     {
         public UserLogic user = new UserLogic();
 
-        /// <summary>
-        /// Listado de todos los useros 
-        /// </summary>
-        [HttpGet]
-        public IHttpActionResult GetAll()
-        {
-            var result = user.List();
-            if (result == null)
-            {
-                return Content(HttpStatusCode.NotFound, "La solicitud no arroja resultados");
-            }
-            return Ok(result);
+        ///// <summary>
+        ///// Listado de todos los useros 
+        ///// </summary>
+        //[HttpGet]
+        //public IHttpActionResult GetAll()
+        //{
+        //    var result = user.List();
+        //    if (result == null)
+        //    {
+        //        return Content(HttpStatusCode.NotFound, "La solicitud no arroja resultados");
+        //    }
+        //    return Ok(result);
 
-        }
+        //}
 
         /// <summary>
         /// Devuelve los datos de un usuario
@@ -70,22 +70,20 @@ namespace WebApi_Mun.Controllers
         /// <param name="data">Datos del usuario</param>
         /// <returns><c>true</c> Si se guardaron los datos</returns>
         [Route("api/User/insert")]
-        [HttpPost]
-        public IHttpActionResult Insert([FromBody] UserInsertModel data) 
+        [HttpPut]
+        public IHttpActionResult Insert([FromBody] UserModel data)
         {
-            //if (!ModelState.IsValid)
-            //{
-            //    return Content(HttpStatusCode.BadRequest, "Los datos no son validos");
-            //}
-            //var result = user.Insert(data);
-            //if (result == -2)
-            //    return Content(HttpStatusCode.BadRequest, "Los datos solicitados no existen");
-            //return Ok();
+            if (!ModelState.IsValid)
+            {
+                return Content(HttpStatusCode.BadRequest, "Los datos no son validos");
+            }
+            user.Insert(data);
+
             return Ok();
         }
 
         [Route("api/User/update/{userId}")]
-        [HttpPut]
+        [HttpPost]
         public IHttpActionResult Update(int userId, [FromBody] UserModel data)
         {
            
@@ -96,26 +94,6 @@ namespace WebApi_Mun.Controllers
           return Ok();
 
     }
-
-        /// <summary>
-        /// Elimina un user
-        /// </summary>
-        /// <param name="userId"> Identificador del user</param>
-        [Route("api/User/delete/{userId}")]
-        [HttpDelete]
-        public IHttpActionResult Delete(int userId)
-        {
-
-           var result = Data.UserLogic.Delete(userId);
-
-               if (result == -2)
-                   return Content(HttpStatusCode.BadRequest, "Los datos solicitados no existen");
-
-               return Ok();
-
-            
-        }
-
 
     }
 }

@@ -18,7 +18,7 @@ namespace WebApi_Mun.Data
         /// Devuelve todos las categorias d eun usuario
         /// </summary>
         /// <returns>Lista de categorias</returns>
-        internal static DiscountModel[] List(int userId)
+        public DiscountModel[] List()
         {
             var items = new List<DiscountModel>();
             using (var connection = new SqlConnection(connectionString))
@@ -33,8 +33,8 @@ namespace WebApi_Mun.Data
                     {
                         var c = new DiscountModel();
                         c.DiscountId = objDR.GetInt32(0);
-                        c.Name = objDR.GetString(1);
-                        c.State = objDR.GetBoolean(2);
+                        c.Amount = objDR.GetByte(1);
+                        c.State = objDR.GetByte(2) == 1 ? true : false;
 
                         items.Add(c);
                     }
@@ -47,17 +47,51 @@ namespace WebApi_Mun.Data
         }
 
         /// <summary>
+        /// Devuelve todos las categorias d eun usuario
+        /// </summary>
+        /// <returns>Lista de categorias</returns>
+        public DiscountModel[] ListActive()
+        {
+            var items = new List<DiscountModel>();
+            using (var connection = new SqlConnection(connectionString))
+            {
+                using (var objCmd = new SqlCommand("Discount_List_Active", connection))
+                {
+                    connection.Open();
+                    objCmd.CommandType = CommandType.StoredProcedure;
+                    SqlDataReader objDR = objCmd.ExecuteReader();
+
+                    while (objDR.Read())
+                    {
+                        var c = new DiscountModel();
+                        c.DiscountId = objDR.GetInt32(0);
+                        c.Amount = objDR.GetByte(1);
+                        c.State = objDR.GetByte(2) == 1 ? true : false;
+
+                        items.Add(c);
+                    }
+                    return items.ToArray();
+
+                }
+
+            }
+
+        }
+
+
+        /// <summary>
         /// Devuelve los datos de una categoria
         /// </summary>
         /// <param name="userId">Identificador del categoria</param>
         /// <returns>Datos de categoria</returns>
-        internal static DiscountModel Get(int userId)
+        public DiscountModel Get(int discountId)
         {
             var items = new DiscountModel();
             using (var connection = new SqlConnection(connectionString))
             {
                 using (var objCmd = new SqlCommand("Discount_Get", connection))
                 {
+                    objCmd.Parameters.Add("@DiscountId", SqlDbType.Int).Value = discountId;
                     objCmd.CommandType = CommandType.StoredProcedure;
                     connection.Open();
                     using (var objDR = objCmd.ExecuteReader(CommandBehavior.SingleRow))
@@ -68,8 +102,8 @@ namespace WebApi_Mun.Data
                         }
 
                         items.DiscountId = objDR.GetInt32(0);
-                        items.Name = objDR.GetString(1);
-                        items.State = objDR.GetBoolean(1);
+                        items.Amount = objDR.GetByte(1);
+                        items.State = objDR.GetByte(2) == 1 ? true : false;
 
                     }
                 }
@@ -83,29 +117,27 @@ namespace WebApi_Mun.Data
         /// </summary>
         /// <param name="data">Datos de la categoria</param>
         /// <returns><c>true</c> Si se guardaron los datos</returns>
-        internal static int Save(int? categoryId, DiscountModel data)
+        public int Save( int? discountId, DiscountModel data)
         {
             using (var connection = new SqlConnection(connectionString))
             {
 
                 SqlCommand objCmd;
                 var store = "";
-                if (categoryId.HasValue && categoryId != 0)
+                if (data.DiscountId.HasValue && data.DiscountId != 0)
                 {
-                    store = "Discount_Update";
-                    objCmd = new SqlCommand("Discount_Update", connection);
-
+                    store = "Discount_Update";                 
                 }
                 else
                     store = "Discount_Add";
                 using (objCmd = new SqlCommand(store, connection))
                 {
                     if (store.Equals("Discount_Update"))
-                        objCmd.Parameters.Add("@DiscountId", SqlDbType.Int).Value = categoryId;
-
+                        objCmd.Parameters.Add("@DiscountId", SqlDbType.Int).Value = data.DiscountId;
                     objCmd.CommandType = CommandType.StoredProcedure;
-                    objCmd.Parameters.Add("@Name", SqlDbType.Char, 5).Value = data.Name;
-                    objCmd.Parameters.Add("@State", SqlDbType.Char, 5).Value = data.State;
+                    objCmd.Parameters.Add("@Amount", SqlDbType.TinyInt).Value = data.Amount;
+                    objCmd.Parameters.Add("@State", SqlDbType.TinyInt).Value = data.State;
+                    objCmd.Parameters.Add("@CreatedBy", SqlDbType.Int).Value = data.CreatedBy;
 
                     connection.Open();
                     var result = objCmd.ExecuteNonQuery();

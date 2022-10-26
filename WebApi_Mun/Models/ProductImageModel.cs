@@ -6,13 +6,25 @@ using System.Web;
 
 namespace WebApi_Mun.Models
 {
-    public class CategoryModel
+    public class ProductImageModel
     {
 
         /// <summary>
         /// Identificador Categoria
         /// </summary>
-        public int? CategoryId { get; set; }
+        public int? ProductImageId { get; set; }
+
+        /// <summary>
+        /// Identificador Categoria
+        /// </summary>
+        public int? ImageId { get; set; }
+
+
+        /// <summary>
+        /// Identificador Categoria
+        /// </summary>
+        public int? ProductId { get; set; }
+
 
 
         /// <summary>
@@ -20,10 +32,6 @@ namespace WebApi_Mun.Models
         /// </summary>
         public string Name { get; set; }
 
-        /// <summary>
-        /// Nombre
-        /// </summary>
-        public bool State { get; set; }
 
     }
 }

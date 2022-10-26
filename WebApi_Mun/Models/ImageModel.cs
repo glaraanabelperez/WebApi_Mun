@@ -6,7 +6,7 @@ using System.Web;
 
 namespace WebApi_Mun.Models
 {
-    public class ImagesModel
+    public class ImageModel
     {
 
         /// <summary>

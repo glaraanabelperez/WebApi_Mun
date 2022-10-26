@@ -18,7 +18,7 @@ namespace WebApi_Mun.Data
         /// Devuelve todos las categorias d eun usuario
         /// </summary>
         /// <returns>Lista de categorias</returns>
-        internal static MarcaModel[] List(int userId)
+        public MarcaModel[] List()
         {
             var items = new List<MarcaModel>();
             using (var connection = new SqlConnection(connectionString))
@@ -28,13 +28,14 @@ namespace WebApi_Mun.Data
                     connection.Open();
                     objCmd.CommandType = CommandType.StoredProcedure;
                     SqlDataReader objDR = objCmd.ExecuteReader();
-
+                    var count = 0;
                     while (objDR.Read())
                     {
+                        count = count + 1;
                         var c = new MarcaModel();
                         c.MarcaId = objDR.GetInt32(0);
                         c.Name = objDR.GetString(1);
-                        c.State = objDR.GetBoolean(2);
+                        c.State = objDR.GetByte(2)==1 ? true: false;
 
                         items.Add(c);
                     }
@@ -47,17 +48,49 @@ namespace WebApi_Mun.Data
         }
 
         /// <summary>
+        /// Devuelve todos las categorias d eun usuario
+        /// </summary>
+        /// <returns>Lista de categorias</returns>
+        public MarcaModel[] ListActive()
+        {
+            var items = new List<MarcaModel>();
+            using (var connection = new SqlConnection(connectionString))
+            {
+                using (var objCmd = new SqlCommand("Marca_List_Active", connection))
+                {
+                    connection.Open();
+                    objCmd.CommandType = CommandType.StoredProcedure;
+                    SqlDataReader objDR = objCmd.ExecuteReader();
+                    while (objDR.Read())
+                    {
+                        var c = new MarcaModel();
+                        c.MarcaId = objDR.GetInt32(0);
+                        c.Name = objDR.GetString(1);
+                        c.State = objDR.GetByte(2) == 1 ? true : false;
+
+                        items.Add(c);
+                    }
+                    return items.ToArray();
+
+                }
+
+            }
+
+        }
+
+        /// <summary>
         /// Devuelve los datos de una categoria
         /// </summary>
         /// <param name="userId">Identificador del categoria</param>
         /// <returns>Datos de categoria</returns>
-        internal static MarcaModel Get(int userId)
+        public MarcaModel Get(int marcaId)
         {
             var items = new MarcaModel();
             using (var connection = new SqlConnection(connectionString))
             {
                 using (var objCmd = new SqlCommand("Marca_Get", connection))
                 {
+                    objCmd.Parameters.Add("@MarcaId", SqlDbType.Int).Value = marcaId;
                     objCmd.CommandType = CommandType.StoredProcedure;
                     connection.Open();
                     using (var objDR = objCmd.ExecuteReader(CommandBehavior.SingleRow))
@@ -69,7 +102,7 @@ namespace WebApi_Mun.Data
 
                         items.MarcaId = objDR.GetInt32(0);
                         items.Name = objDR.GetString(1);
-                        items.State = objDR.GetBoolean(1);
+                        items.State = objDR.GetByte(2) == 1 ? true : false;
 
                     }
                 }
@@ -83,14 +116,14 @@ namespace WebApi_Mun.Data
         /// </summary>
         /// <param name="data">Datos de la categoria</param>
         /// <returns><c>true</c> Si se guardaron los datos</returns>
-        internal static int Save(int? categoryId, MarcaModel data)
+        public int Save(int? marcaId, MarcaModel data)
         {
             using (var connection = new SqlConnection(connectionString))
             {
 
                 SqlCommand objCmd;
                 var store = "";
-                if (categoryId.HasValue && categoryId != 0)
+                if (data.MarcaId.HasValue && data.MarcaId != 0)
                 {
                     store = "Marca_Update";
                     objCmd = new SqlCommand("Marca_Update", connection);
@@ -101,16 +134,23 @@ namespace WebApi_Mun.Data
                 using (objCmd = new SqlCommand(store, connection))
                 {
                     if (store.Equals("Marca_Update"))
-                        objCmd.Parameters.Add("@MarcaId", SqlDbType.Int).Value = categoryId;
-
+                        objCmd.Parameters.Add("@MarcaId", SqlDbType.Int).Value = data.MarcaId;
                     objCmd.CommandType = CommandType.StoredProcedure;
-                    objCmd.Parameters.Add("@Name", SqlDbType.Char, 5).Value = data.Name;
-                    objCmd.Parameters.Add("@State", SqlDbType.Char, 5).Value = data.State;
+                    objCmd.Parameters.Add("@Name", SqlDbType.VarChar, 150).Value = data.Name;
+                    objCmd.Parameters.Add("@State", SqlDbType.TinyInt, 1).Value = data.State ? 1 :0;
+                   
+                    try
+                    {
+                        connection.Open();
+                        var result = objCmd.ExecuteNonQuery();
 
-                    connection.Open();
-                    var result = objCmd.ExecuteNonQuery();
-
-                    return result;
+                        return result;
+                    }
+                    catch (Exception e)
+                    {
+                        throw e;
+                    }
+                    
                 }
 
             }
