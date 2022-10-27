@@ -23,7 +23,7 @@ namespace WebApi_Mun.Models
         /// <summary>
         /// Nombre
         /// </summary>
-        public bool State { get; set; }
+        public bool? State { get; set; }
         /// <summary>
         /// Identificador usuario creador
         /// </summary>

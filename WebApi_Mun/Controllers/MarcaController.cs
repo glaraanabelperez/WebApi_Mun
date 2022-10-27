@@ -14,7 +14,7 @@ namespace WebApi_Mun.Controllers
         public MarcaLogic mar = new MarcaLogic();
 
         /// <summary>
-        /// Listado de todas las categorias segun usuario
+        /// Listado de todas las marcas
         /// </summary>
         [Route("api/marca/list/")]
         [HttpGet]
@@ -37,9 +37,9 @@ namespace WebApi_Mun.Controllers
         }
 
         /// <summary>
-        /// Listado de todas las categorias segun usuario
+        /// Listado de todas las marcas activas
         /// </summary>
-        [Route("api/category/listActive/")]
+        [Route("api/marca/listActive/")]
         [HttpGet]
         public IHttpActionResult GetAllActive()
         {
@@ -62,10 +62,10 @@ namespace WebApi_Mun.Controllers
 
 
         /// <summary>
-        /// Devuelve los datos de un categoria
+        /// Devuelve los datos de una marca
         /// </summary>
-        /// <param name="categoryId">Identificador del categoria</param>
-        /// <returns>Datos del categoria</returns>
+        /// <param name="categoryId">Identificador de la marca</param>
+        /// <returns>Datos de la marca</returns>
         [Route("api/marca/{marcaId}")]
         [HttpGet]
         public IHttpActionResult Get(int marcaId)
@@ -79,9 +79,9 @@ namespace WebApi_Mun.Controllers
         }
 
         /// <summary>
-        /// Graba los datos del categoria
+        /// Graba los datos de la marca
         /// </summary>
-        /// <param name="data">Datos del categoria</param>
+        /// <param name="data">Datos de la marca</param>
         /// <returns><c>true</c> Si se guardaron los datos</returns>
         [HttpPut]
         public IHttpActionResult Put([FromBody] MarcaModel data)
@@ -103,29 +103,70 @@ namespace WebApi_Mun.Controllers
         }
 
         /// <summary>
-        /// Graba los datos del categoria
+        /// Actualiza la marca
         /// </summary>
-        /// <param name="data">Datos del categoria</param>
+        /// <param name="data">Datos de la marca</param>
         /// <returns><c>true</c> Si se guardaron los datos</returns>
         [Route("api/marca/{marcaId}")]
         [HttpPost]
         public IHttpActionResult Post(int marcaId, [FromBody] MarcaModel data)
         {
-            if (data == null || !ModelState.IsValid )
+            if (data == null || !ModelState.IsValid && data.MarcaId == marcaId)
             {
                 return BadRequest("El modelo de datos esta incorrecto o vacio");
             }
             try
             {
                 var result = mar.Save(marcaId, data);
-
-                return Ok();
+                if (result > 0)
+                {
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest("El elemento a editar no existe");
+                }
+                
             }
             catch (Exception ex)
             {
                 return Content(HttpStatusCode.InternalServerError, ex.Message);
             }
 
+        }
+
+        /// <summary>
+        /// Cambia el estado de la marca
+        /// </summary>
+        /// <param name="data">Datos del estado</param>
+        /// <returns><c>1</c> Si se guardaron los datos</returns>
+        [Route("api/marca/state/")]
+        [HttpPost]
+        public IHttpActionResult ChangeState([FromBody] StateModel data)
+        {
+            if (data == null || !ModelState.IsValid)
+            {
+                return BadRequest("El modelo de datos esta incorrecto o vacio");
+            }
+            try
+            {
+                int result = mar.Desactive(data);
+
+                if (result > 0)
+                {
+                    return Ok();
+                }
+                else
+                {
+
+                    return BadRequest("El elemento a editar no existe");
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return Content(HttpStatusCode.InternalServerError, ex.Message);
+            }
         }
 
     }

@@ -15,9 +15,9 @@ namespace WebApi_Mun.Data
         static string connectionString = ConfigurationManager.ConnectionStrings["MundoConnection"].ConnectionString;
 
         /// <summary>
-        /// Devuelve todos las categorias d eun usuario
+        /// Devuelve todos las masrcas
         /// </summary>
-        /// <returns>Lista de categorias</returns>
+        /// <returns>Lista de marcas</returns>
         public MarcaModel[] List()
         {
             var items = new List<MarcaModel>();
@@ -48,9 +48,9 @@ namespace WebApi_Mun.Data
         }
 
         /// <summary>
-        /// Devuelve todos las categorias d eun usuario
+        /// Devuelve las marcas activas
         /// </summary>
-        /// <returns>Lista de categorias</returns>
+        /// <returns>Lista de marcas activas</returns>
         public MarcaModel[] ListActive()
         {
             var items = new List<MarcaModel>();
@@ -79,10 +79,10 @@ namespace WebApi_Mun.Data
         }
 
         /// <summary>
-        /// Devuelve los datos de una categoria
+        /// Devuelve los datos de una marca
         /// </summary>
-        /// <param name="userId">Identificador del categoria</param>
-        /// <returns>Datos de categoria</returns>
+        /// <param name="userId">Identificador de la marca</param>
+        /// <returns>Datos de marca</returns>
         public MarcaModel Get(int marcaId)
         {
             var items = new MarcaModel();
@@ -112,9 +112,9 @@ namespace WebApi_Mun.Data
         }
 
         /// <summary>
-        /// Graba la categoria
+        /// Graba la marca
         /// </summary>
-        /// <param name="data">Datos de la categoria</param>
+        /// <param name="data">Datos de la marca</param>
         /// <returns><c>true</c> Si se guardaron los datos</returns>
         public int Save(int? marcaId, MarcaModel data)
         {
@@ -123,21 +123,20 @@ namespace WebApi_Mun.Data
 
                 SqlCommand objCmd;
                 var store = "";
-                if (data.MarcaId.HasValue && data.MarcaId != 0)
+                if (data.MarcaId.HasValue && data.MarcaId != 0 )
                 {
                     store = "Marca_Update";
                     objCmd = new SqlCommand("Marca_Update", connection);
-
                 }
                 else
                     store = "Marca_Add";
+
                 using (objCmd = new SqlCommand(store, connection))
                 {
                     if (store.Equals("Marca_Update"))
                         objCmd.Parameters.Add("@MarcaId", SqlDbType.Int).Value = data.MarcaId;
                     objCmd.CommandType = CommandType.StoredProcedure;
                     objCmd.Parameters.Add("@Name", SqlDbType.VarChar, 150).Value = data.Name;
-                    objCmd.Parameters.Add("@State", SqlDbType.TinyInt, 1).Value = data.State ? 1 :0;
                    
                     try
                     {
@@ -157,6 +156,26 @@ namespace WebApi_Mun.Data
            
         }
 
-      
+        /// <summary>
+        /// Cambia el estado de la entidad
+        /// </summary>
+        /// <param name="data">Datos de la entidad</param>
+        /// <returns><c>true</c> Si se guardaron los datos</returns>
+        public int Desactive(StateModel data)
+        {
+            string queryString = string.Format("update Marcas set [State]={0} where MarcaId= {1}", data.State ? 1 : 0, data.ItemId);
+            using (var connection = new SqlConnection(connectionString))
+            {
+                using (var objCmd = new SqlCommand(queryString, connection))
+                {
+                    connection.Open();
+                    var result = objCmd.ExecuteNonQuery();
+                    connection.Close();
+                    return result;
+                }
+            }
+
+
+        }
     }
 }

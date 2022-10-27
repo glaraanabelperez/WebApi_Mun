@@ -34,7 +34,8 @@ namespace WebApi_Mun.Data
                         var c = new DiscountModel();
                         c.DiscountId = objDR.GetInt32(0);
                         c.Amount = objDR.GetByte(1);
-                        c.State = objDR.GetByte(2) == 1 ? true : false;
+                        c.CreatedBy= objDR.GetInt32(2);
+                        c.State = objDR.GetByte(3) == 1 ? true : false;
 
                         items.Add(c);
                     }
@@ -66,7 +67,8 @@ namespace WebApi_Mun.Data
                         var c = new DiscountModel();
                         c.DiscountId = objDR.GetInt32(0);
                         c.Amount = objDR.GetByte(1);
-                        c.State = objDR.GetByte(2) == 1 ? true : false;
+                        c.CreatedBy = objDR.GetInt32(2);
+                        c.State = objDR.GetByte(3) == 1 ? true : false;
 
                         items.Add(c);
                     }
@@ -103,7 +105,8 @@ namespace WebApi_Mun.Data
 
                         items.DiscountId = objDR.GetInt32(0);
                         items.Amount = objDR.GetByte(1);
-                        items.State = objDR.GetByte(2) == 1 ? true : false;
+                        items.CreatedBy = objDR.GetInt32(2);
+                        items.State = objDR.GetByte(3) == 1 ? true : false;
 
                     }
                 }
@@ -124,7 +127,7 @@ namespace WebApi_Mun.Data
 
                 SqlCommand objCmd;
                 var store = "";
-                if (data.DiscountId.HasValue && data.DiscountId != 0)
+                if (data.DiscountId.HasValue && data.DiscountId != 0 )
                 {
                     store = "Discount_Update";                 
                 }
@@ -135,12 +138,11 @@ namespace WebApi_Mun.Data
                     if (store.Equals("Discount_Update"))
                         objCmd.Parameters.Add("@DiscountId", SqlDbType.Int).Value = data.DiscountId;
                     objCmd.CommandType = CommandType.StoredProcedure;
-                    objCmd.Parameters.Add("@Amount", SqlDbType.TinyInt).Value = data.Amount;
-                    objCmd.Parameters.Add("@State", SqlDbType.TinyInt).Value = data.State;
+                    objCmd.Parameters.Add("@Amount", SqlDbType.TinyInt).Value = data.Amount;                 
                     objCmd.Parameters.Add("@CreatedBy", SqlDbType.Int).Value = data.CreatedBy;
 
                     connection.Open();
-                    var result = objCmd.ExecuteNonQuery();
+                    Int32 result = objCmd.ExecuteNonQuery();
 
                     return result;
                 }
@@ -149,6 +151,22 @@ namespace WebApi_Mun.Data
            
         }
 
-      
+        public int Desactive(StateModel data)
+        {
+            string queryString = string.Format("update Discounts set [State]={0} where DiscountId= {1}", data.State ? 1: 0, data.ItemId);
+            using (var connection = new SqlConnection(connectionString))
+            {
+                using (var objCmd = new SqlCommand(queryString, connection))
+                {
+                    connection.Open();
+                    var result =objCmd.ExecuteNonQuery();
+                    connection.Close();
+                    return result;
+                }
+            }
+           
+
+        }
+
     }
 }

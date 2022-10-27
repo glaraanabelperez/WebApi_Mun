@@ -6,24 +6,18 @@ using System.Web;
 
 namespace WebApi_Mun.Models
 {
-    public class MarcaModel
+    public class StateModel
     {
 
         /// <summary>
-        /// Identificador marca
+        /// Identificador Entidad
         /// </summary>
-        public int? MarcaId { get; set; }
-
-
-        /// <summary>
-        /// Nombre
-        /// </summary>
-        public string Name { get; set; }
+        public int? ItemId { get; set; }
 
         /// <summary>
-        /// Nombre
+        /// Estado
         /// </summary>
-        public bool? State { get; set; }
+        public bool State { get; set; }
 
     }
 }
