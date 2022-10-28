@@ -60,24 +60,46 @@ namespace WebApi_Mun.Controllers
         [HttpPost]
         public IHttpActionResult Insert([FromBody] ProductModel data)
         {
-            var item = prodLogic.Save(null, data);
-            if (item != -1)
+            if (ModelState.IsValid)
             {
-                return NotFound();
+                try
+                {
+                    prodLogic.Save(data);
+                    return Ok(data);
+                }
+                catch (Exception e)
+                {
+                    return Content(HttpStatusCode.InternalServerError, e.Message);
+                }
             }
-            return Ok(item);
+
+            return BadRequest("El modelo de datos esta incorrecto o vacio");
         }
 
-        [Route("api/Product/{productId}")]
+        //[Route("api/Product/")]
         [HttpPut]
-        public IHttpActionResult Update(int productId, [FromBody] ProductModel data)
+        public IHttpActionResult Update([FromBody] ProductModel data)
         {
 
-            var prod = prodLogic.Save(productId, data);
-            if (prod == -2)
-                return Content(HttpStatusCode.BadRequest, "Los datos solicitados no existen");
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var prod = prodLogic.Save(data);
+                    if (prod < 0)
+                        return Content(HttpStatusCode.BadRequest, "Los datos solicitados no existen");
 
-            return Ok(prod);
+                    prodLogic.Save(data);
+                    return Ok(data);
+                }
+                catch (Exception e)
+                {
+                    return Content(HttpStatusCode.InternalServerError, e.Message);
+                }
+            }
+
+            return BadRequest("El modelo de datos esta incorrecto o vacio");
+
 
         }
 

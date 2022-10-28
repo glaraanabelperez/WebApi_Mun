@@ -86,20 +86,20 @@ namespace WebApi_Mun.Controllers
         [HttpPut]
         public IHttpActionResult Put([FromBody] MarcaModel data)
         {
-            if (data == null || !ModelState.IsValid)
+            if (ModelState.IsValid)
             {
-                return BadRequest("El modelo de datos esta incorrecto o vacio");
+                try
+                {
+                    var result = mar.Save(data);
+                    return Ok();
+                }
+                catch (Exception ex)
+                {
+                    return Content(HttpStatusCode.InternalServerError, ex.Message);
+                }
             }
-            try
-            {
-                var result = mar.Save(null, data);
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return Content(HttpStatusCode.InternalServerError, ex.Message);
-            }
-           
+            
+            return BadRequest("El modelo de datos esta incorrecto o vacio");
         }
 
         /// <summary>
@@ -109,30 +109,30 @@ namespace WebApi_Mun.Controllers
         /// <returns><c>true</c> Si se guardaron los datos</returns>
         [Route("api/marca/{marcaId}")]
         [HttpPost]
-        public IHttpActionResult Post(int marcaId, [FromBody] MarcaModel data)
+        public IHttpActionResult Post([FromBody] MarcaModel data)
         {
-            if (data == null || !ModelState.IsValid && data.MarcaId == marcaId)
+            if (ModelState.IsValid )
             {
-                return BadRequest("El modelo de datos esta incorrecto o vacio");
-            }
-            try
-            {
-                var result = mar.Save(marcaId, data);
-                if (result > 0)
+                try
                 {
-                    return Ok();
-                }
-                else
-                {
-                    return BadRequest("El elemento a editar no existe");
-                }
-                
-            }
-            catch (Exception ex)
-            {
-                return Content(HttpStatusCode.InternalServerError, ex.Message);
-            }
+                    var result = mar.Save(data);
+                    if (result > 0)
+                    {
+                        return Ok();
+                    }
+                    else
+                    {
+                        return BadRequest("El elemento a editar no existe");
+                    }
 
+                }
+                catch (Exception ex)
+                {
+                    return Content(HttpStatusCode.InternalServerError, ex.Message);
+                }
+            }
+            
+            return BadRequest("El modelo de datos esta incorrecto o vacio");
         }
 
         /// <summary>
@@ -144,29 +144,25 @@ namespace WebApi_Mun.Controllers
         [HttpPost]
         public IHttpActionResult ChangeState([FromBody] StateModel data)
         {
-            if (data == null || !ModelState.IsValid)
+            if (ModelState.IsValid)
             {
-                return BadRequest("El modelo de datos esta incorrecto o vacio");
-            }
-            try
-            {
-                int result = mar.Desactive(data);
-
-                if (result > 0)
+                try
                 {
-                    return Ok();
+                    int result = mar.Desactive(data);
+
+                    if (result > 0)
+                        return Ok();
+                    else
+                        return BadRequest("El elemento a editar no existe");
+
                 }
-                else
+                catch (Exception ex)
                 {
-
-                    return BadRequest("El elemento a editar no existe");
+                    return Content(HttpStatusCode.InternalServerError, ex.Message);
                 }
-
             }
-            catch (Exception ex)
-            {
-                return Content(HttpStatusCode.InternalServerError, ex.Message);
-            }
+            
+            return BadRequest("El modelo de datos esta incorrecto o vacio");
         }
 
     }

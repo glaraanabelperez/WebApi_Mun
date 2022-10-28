@@ -120,7 +120,7 @@ namespace WebApi_Mun.Data
         /// </summary>
         /// <param name="data">Datos de la categoria</param>
         /// <returns><c>true</c> Si se guardaron los datos</returns>
-        public int Save( int? discountId, DiscountModel data)
+        public int Save(DiscountModel data)
         {
             using (var connection = new SqlConnection(connectionString))
             {

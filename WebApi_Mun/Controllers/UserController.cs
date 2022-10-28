@@ -73,27 +73,43 @@ namespace WebApi_Mun.Controllers
         [HttpPut]
         public IHttpActionResult Insert([FromBody] UserModel data)
         {
-            if (!ModelState.IsValid)
+            if (ModelState.IsValid)
             {
-                return Content(HttpStatusCode.BadRequest, "Los datos no son validos");
+                try
+                {
+                    user.Insert(data);
+                    return Ok();
+                }
+                catch (Exception ex)
+                {
+                    return Content(HttpStatusCode.InternalServerError, ex.Message);
+                }
             }
-            user.Insert(data);
+            return BadRequest("El modelo de datos esta incorrecto o vacio");
 
-            return Ok();
         }
 
         [Route("api/User/update/{userId}")]
         [HttpPost]
-        public IHttpActionResult Update(int userId, [FromBody] UserModel data)
+        public IHttpActionResult Update([FromBody] UserModel data)
         {
-           
-          var result = user.Update(userId, data);
-          if (result == -2)
-              return Content(HttpStatusCode.BadRequest, "Los datos solicitados no existen");
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var result = user.Update(data);
+                    if (result < 0)
+                        return Content(HttpStatusCode.NotFound, "El dato a editar no existe");
 
-          return Ok();
-
-    }
+                    return Ok();
+                }
+                catch (Exception ex)
+                {
+                    return Content(HttpStatusCode.InternalServerError, ex.Message);
+                }
+            }
+            return BadRequest("El modelo de datos esta incorrecto o vacio");
+        }
 
     }
 }

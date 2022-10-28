@@ -116,7 +116,7 @@ namespace WebApi_Mun.Data
         /// </summary>
         /// <param name="data">Datos de la marca</param>
         /// <returns><c>true</c> Si se guardaron los datos</returns>
-        public int Save(int? marcaId, MarcaModel data)
+        public int Save(MarcaModel data)
         {
             using (var connection = new SqlConnection(connectionString))
             {
@@ -174,8 +174,8 @@ namespace WebApi_Mun.Data
                     return result;
                 }
             }
-
-
         }
+
+
     }
 }

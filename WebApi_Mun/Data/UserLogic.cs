@@ -86,22 +86,20 @@ namespace WebApi_Mun.Data
         /// <param name="data">Datos del usuario</param>
         /// <param name="userId">Identificador del usuario</param>
         /// <returns><c>true</c> Si se guardaron los datos</returns>
-        public int Update(int userId, UserModel data)
+        public int Update(UserModel data)
         {
             using (var connection = new SqlConnection(connectionString))
             {
                 using (SqlCommand objCmd = new SqlCommand("User_Update", connection))
                 {
                     objCmd.CommandType = CommandType.StoredProcedure;
-                    objCmd.Parameters.Add("@UserId", SqlDbType.Int).Value = userId;
+                    objCmd.Parameters.Add("@UserId", SqlDbType.Int).Value = data.UserId;
 
                     if (data.UserName != null)
                         objCmd.Parameters.Add("@Business_Name", SqlDbType.VarChar).Value = data.UserName;
                     if (data.Password != null)
                         objCmd.Parameters.Add("@Direction", SqlDbType.VarChar).Value = data.Password;
                   
-
-
                     connection.Open();
 
 

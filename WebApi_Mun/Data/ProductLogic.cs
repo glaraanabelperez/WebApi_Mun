@@ -283,12 +283,12 @@ namespace WebApi_Mun.Data
         /// <param name="data">Datos del prodcuto</param>
         /// <param name="userId">Identificador del usuario que graba</param>
         /// <returns><c>true</c> Si se guardaron los datos, en caso contrario quiere decir que el nombre está repetido</returns>
-        public int Save(int? productId, ProductModel data)
+        public int Save(ProductModel data)
         {
             using (var connection = new SqlConnection(connectionString))
             {   
                 var store = "";
-                if (productId.HasValue && productId.Value != 0)
+                if (data.ProductId.HasValue && data.ProductId.Value != 0)
                     store = "Product_Update";
                 else
                     store = "Product_Add";
@@ -296,7 +296,7 @@ namespace WebApi_Mun.Data
                  using(SqlCommand objCmd = new SqlCommand(store, connection))
                 {
                     if (store.Equals("Product_Update"))
-                        objCmd.Parameters.Add("@ProductId", SqlDbType.Int).Value = productId;
+                        objCmd.Parameters.Add("@ProductId", SqlDbType.Int).Value = data.ProductId;
                     objCmd.CommandType = CommandType.StoredProcedure;
                     objCmd.Parameters.Add("@CategoryId", SqlDbType.Int).Value = data.CategoryId;
                     objCmd.Parameters.Add("@MarcaId", SqlDbType.Int).Value = data.MarcaId;
@@ -318,7 +318,22 @@ namespace WebApi_Mun.Data
 
         }
 
+        public int Desactive(StateModel data)
+        {
+            string queryString = string.Format("update Products set [State]={0} where ProductId= {1}", data.State ? 1 : 0, data.ItemId);
+            using (var connection = new SqlConnection(connectionString))
+            {
+                using (var objCmd = new SqlCommand(queryString, connection))
+                {
+                    connection.Open();
+                    var result = objCmd.ExecuteNonQuery();
+                    connection.Close();
+                    return result;
+                }
+            }
 
+
+        }
 
     }
 }

@@ -32,6 +32,32 @@ namespace WebApi_Mun.Controllers
                 return Content(HttpStatusCode.NotFound, ex.Message);
             }
         }
+
+        /// <summary>
+        /// Listado de todas las categorias activas
+        /// </summary>
+        [Route("api/category/listActive/")]
+        [HttpGet]
+        public IHttpActionResult GetAllActive()
+        {
+            try
+            {
+                var list = cat.ListActive();
+                if (list == null)
+                {
+                    return NotFound();
+                }
+
+                return Ok(list);
+
+            }
+            catch (Exception ex)
+            {
+                return Content(HttpStatusCode.NotFound, ex.Message);
+            }
+        }
+
+
         /// <summary>
         /// Devuelve los datos de un categoria
         /// </summary>
@@ -56,23 +82,73 @@ namespace WebApi_Mun.Controllers
         [HttpPut]
         public IHttpActionResult Put([FromBody] CategoryModel data)
         {
-            var userItem = cat.Save(null, data);
-            if (userItem != 0)
+          
+            if (ModelState.IsValid)
             {
-                return NotFound();
+                try
+                {
+                    cat.Save(data);
+                    return Ok();
+                }
+                catch (Exception ex)
+                {
+                    return Content(HttpStatusCode.InternalServerError, ex.Message);
+                }        
             }
-            return Ok();
+            return BadRequest("El modelo de datos esta incorrecto o vacio");
         }
 
+
         [HttpPost]
-        public IHttpActionResult Update(int categoryId, [FromBody] CategoryModel data)
+        public IHttpActionResult Update([FromBody] CategoryModel data)
         {
-            var userItem = cat.Save(categoryId, data);
-            if (userItem != 0)
+            if (ModelState.IsValid)
             {
-                return NotFound();
+                try
+                {
+                    var result = cat.Save(data);
+                    if (result < 0)
+                        return Content(HttpStatusCode.NotFound, "El dato a editar no existe");
+                    
+                    return Ok();
+                }
+                catch (Exception ex)
+                {
+                    return Content(HttpStatusCode.InternalServerError, ex.Message);
+                }
             }
-            return Ok();
+            
+            return BadRequest("El modelo de datos esta incorrecto o vacio");
+        }
+
+
+        /// <summary>
+        /// Cambia el estado de la marca
+        /// </summary>
+        /// <param name="data">Datos del estado</param>
+        /// <returns><c>1</c> Si se guardaron los datos</returns>
+        [Route("api/category/state/")]
+        [HttpPost]
+        public IHttpActionResult ChangeState([FromBody] StateModel data)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    int result = cat.Desactive(data);
+
+                    if (result > 0)
+                        return Ok();
+                    else
+                        return BadRequest("El elemento a editar no existe");
+                }
+                catch (Exception ex)
+                {
+                    return Content(HttpStatusCode.InternalServerError, ex.Message);
+                }
+            }
+           
+            return BadRequest("El modelo de datos esta incorrecto o vacio");
         }
 
 

@@ -87,19 +87,20 @@ namespace WebApi_Mun.Controllers
         public IHttpActionResult Put([FromBody] DiscountModel data)
         {
 
-            if (data == null || !ModelState.IsValid)
+            if (ModelState.IsValid)
             {
-                return BadRequest("El modelo de datos esta incorrecto o vacio");
+                try
+                {
+                    var result = dis.Save(null, data);
+                    return Ok();
+                }
+                catch (Exception ex)
+                {
+                    return Content(HttpStatusCode.InternalServerError, ex.Message);
+                }
             }
-            try
-            {
-                var result = dis.Save(null, data);
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return Content(HttpStatusCode.InternalServerError, ex.Message);
-            }
+            
+            return BadRequest("El modelo de datos esta incorrecto o vacio");
         }
 
         /// <summary>
@@ -109,29 +110,32 @@ namespace WebApi_Mun.Controllers
         /// <returns><c>true</c> Si se guardaron los datos</returns>
         [Route("api/discount/{discountId}")]
         [HttpPost]
-        public IHttpActionResult Post(int discountId, [FromBody] DiscountModel data)
+        public IHttpActionResult Post([FromBody] DiscountModel data)
         {
 
-            if (data == null || !ModelState.IsValid || data.DiscountId==null && data.DiscountId == discountId)
+            if (ModelState.IsValid)
             {
-                return BadRequest("El modelo de datos esta incorrecto o vacio");
-            }
-            try
-            {
-                int result = dis.Save(discountId, data);
-                if (result > 0)
+                try
                 {
-                    return Ok();
-                }else{
+                    int result = dis.Save(data);
+                    if (result > 0)
+                    {
+                        return Ok();
+                    }
+                    else
+                    {
 
-                    return  BadRequest("El elemento a editar no existe");
+                        return BadRequest("El elemento a editar no existe");
+                    }
+
                 }
-                
+                catch (Exception ex)
+                {
+                    return Content(HttpStatusCode.InternalServerError, ex.Message);
+                }
             }
-            catch (Exception ex)
-            {
-                return Content(HttpStatusCode.InternalServerError, ex.Message);
-            }
+            
+            return BadRequest("El modelo de datos esta incorrecto o vacio");
         }
 
         /// <summary>
@@ -143,29 +147,24 @@ namespace WebApi_Mun.Controllers
         [HttpPost]
         public IHttpActionResult ChangeState([FromBody] StateModel data)
         {
-            if (data == null || !ModelState.IsValid )
+            if (ModelState.IsValid )
             {
-                return BadRequest("El modelo de datos esta incorrecto o vacio");
-            }
-            try
-            {
-                int result = dis.Desactive(data);
-
-                if (result > 0)
+                try
                 {
-                    return Ok();
+                    int result = dis.Desactive(data);
+
+                    if (result > 0)
+                        return Ok();
+                    else
+                        return BadRequest("El elemento a editar no existe");
                 }
-                else
+                catch (Exception ex)
                 {
-
-                    return BadRequest("El elemento a editar no existe");
+                    return Content(HttpStatusCode.InternalServerError, ex.Message);
                 }
-
             }
-            catch (Exception ex)
-            {
-                return Content(HttpStatusCode.InternalServerError, ex.Message);
-            }
+            
+            return BadRequest("El modelo de datos esta incorrecto o vacio");
         }
 
     }
