@@ -12,7 +12,40 @@ namespace WebApi_Mun.Data
     {
         static string connectionString = ConfigurationManager.ConnectionStrings["MundoConnection"].ConnectionString;
 
- 
+
+        /// <summary>
+        /// Devuelve todos las imagenes segun el producto
+        /// </summary>
+        /// <returns>Lista de marcas</returns>
+        public ProductImageDto[] ListByProduct()
+        {
+            var items = new List<ProductImageDto>();
+            using (var connection = new SqlConnection(connectionString))
+            {
+                using (var objCmd = new SqlCommand("Image_GetByProduct", connection))
+                {
+                    connection.Open();
+                    objCmd.CommandType = CommandType.StoredProcedure;
+                    SqlDataReader objDR = objCmd.ExecuteReader();
+                    var count = 0;
+                    while (objDR.Read())
+                    {
+                        var c = new ProductImageDto();
+                        c.ProductImageId = objDR.GetInt32(0);
+                        c.ProductId = objDR.GetInt32(1);
+                        c.ImageId = objDR.GetInt32(2);
+                        c.Name = objDR.GetString(3);
+                        items.Add(c);
+                    }
+                    return items.ToArray();
+
+                }
+
+            }
+
+        }
+
+
 
         /// <summary>
         /// Graba la imagen
@@ -31,7 +64,7 @@ namespace WebApi_Mun.Data
                     store = "Image_Update";
 
                 }
-                if (data.ProductId.HasValue && data.ProductId != 0 && )
+                else if (data.ProductId.HasValue && data.ProductId != 0 && data.Name.Length>0)
                 {
                     store = "Image_Add";
 
@@ -40,10 +73,11 @@ namespace WebApi_Mun.Data
                 {
                     if (store.Equals("Image_Update"))
                         objCmd.Parameters.Add("@ImageId", SqlDbType.Int).Value = data.ImageId;
+                    if (store.Equals("Image_Add"))
+                        objCmd.Parameters.Add("@ProductId", SqlDbType.Int).Value = data.ProductId;
 
                     objCmd.CommandType = CommandType.StoredProcedure;
                     objCmd.Parameters.Add("@Name", SqlDbType.Char, 5).Value = data.Name;
-                    objCmd.Parameters.Add("@State", SqlDbType.Char, 5).Value = data.State;
 
                     connection.Open();
                     var result = objCmd.ExecuteNonQuery();
@@ -61,18 +95,33 @@ namespace WebApi_Mun.Data
         /// </summary>
         /// <param name="data">Datos de la entidad</param>
         /// <returns><c>true</c> Si se guardaron los datos</returns>
-        public int Desactive(StateModel data)
+        public int Delete(ProductImageDto data)
         {
-            string queryString = string.Format("update Categories set [State]={0} where CategoryId= {1}", data.State ? 1 : 0, data.ItemId);
             using (var connection = new SqlConnection(connectionString))
             {
-                using (var objCmd = new SqlCommand(queryString, connection))
+
+                SqlCommand objCmd;
+                var store = "";
+                if (data.ImageId.HasValue && data.ImageId != 0 && data.ProductId.HasValue && data.ProductId!=0)
                 {
+                    store = "Image_Delete";
+
+                }
+
+                using (objCmd = new SqlCommand(store, connection))
+                {
+                    
+                    objCmd.Parameters.Add("@ImageId", SqlDbType.Int).Value = data.ImageId;
+                    objCmd.Parameters.Add("@ProductId", SqlDbType.Int).Value = data.ProductId;
+
+                    objCmd.CommandType = CommandType.StoredProcedure;
+
                     connection.Open();
                     var result = objCmd.ExecuteNonQuery();
-                    connection.Close();
+
                     return result;
                 }
+
             }
 
 

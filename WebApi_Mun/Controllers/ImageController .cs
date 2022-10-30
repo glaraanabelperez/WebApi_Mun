@@ -11,12 +11,12 @@ namespace WebApi_Mun.Controllers
     [EnableCors(origins: "http://localhost:4200", headers: "*", methods: "*")]
     public class ImageController : ApiController
     {
-        public ImageLogic cat = new ImageLogic();
+        public ImageLogic im = new ImageLogic();
 
         /// <summary>
         /// Listado de todas las categorias segun usuario
         /// </summary>
-        [Route("api/category/list/")]
+        [Route("api/imageByProduct/")]
         [HttpGet]
         public IHttpActionResult GetAll()
         {
@@ -24,7 +24,7 @@ namespace WebApi_Mun.Controllers
             {
                 //List<ProductModel> orderDToList;
                 
-                var list = cat.List();
+                var list = im.ListByProduct();
                 return Ok(list);
             }
             catch (Exception ex)
@@ -33,62 +33,22 @@ namespace WebApi_Mun.Controllers
             }
         }
 
-        /// <summary>
-        /// Listado de todas las categorias activas
-        /// </summary>
-        [Route("api/category/listActive/")]
-        [HttpGet]
-        public IHttpActionResult GetAllActive()
-        {
-            try
-            {
-                var list = cat.ListActive();
-                if (list == null || list.Length == 0)
-                {
-                    return NotFound();
-                }
-
-                return Ok(list);
-
-            }
-            catch (Exception ex)
-            {
-                return Content(HttpStatusCode.NotFound, ex.Message);
-            }
-        }
-
+       
 
         /// <summary>
-        /// Devuelve los datos de un categoria
+        /// Graba los datos de una imagen
         /// </summary>
-        /// <param name="categoryId">Identificador del categoria</param>
-        /// <returns>Datos del categoria</returns>
-        [Route("api/category/{categoryId}/")]
-        [HttpGet]
-        public IHttpActionResult Get(int categoryId)
-        {
-            var userItem = cat.Get(categoryId);
-            if (userItem == null)
-            {
-                return NotFound();
-            }
-            return Ok(userItem);
-        }
-
-        /// <summary>
-        /// Graba los datos del categoria
-        /// </summary>
-        /// <param name="data">Datos del categoria</param>
+        /// <param name="data">Datos de la imagen</param>
         /// <returns><c>true</c> Si se guardaron los datos</returns>
         [HttpPut]
-        public IHttpActionResult Put([FromBody] CategoryModel data)
+        public IHttpActionResult Put([FromBody] ProductImageDto data)
         {
           
             if (ModelState.IsValid)
             {
                 try
                 {
-                    cat.Save(data);
+                    im.Save(data);
                     return Ok();
                 }
                 catch (Exception ex)
@@ -101,13 +61,13 @@ namespace WebApi_Mun.Controllers
 
 
         [HttpPost]
-        public IHttpActionResult Update([FromBody] CategoryModel data)
+        public IHttpActionResult Update([FromBody] ProductImageDto data)
         {
-            if (ModelState.IsValid)
+            if (ModelState.IsValid && data.ProductImageId.HasValue)
             {
                 try
                 {
-                    var result = cat.Save(data);
+                    var result = im.Save(data);
                     if (result < 0)
                         return Content(HttpStatusCode.NotFound, "El dato a editar no existe");
                     
@@ -124,19 +84,19 @@ namespace WebApi_Mun.Controllers
 
 
         /// <summary>
-        /// Cambia el estado de la marca
+        /// Borra la imagen
         /// </summary>
-        /// <param name="data">Datos del estado</param>
+        /// <param name="data">Datos de la imagen</param>
         /// <returns><c>1</c> Si se guardaron los datos</returns>
         [Route("api/category/state/")]
         [HttpPost]
-        public IHttpActionResult ChangeState([FromBody] StateModel data)
+        public IHttpActionResult DeleteImage([FromBody] ProductImageDto data)
         {
-            if (ModelState.IsValid)
+            if (ModelState.IsValid && data.ProductImageId.HasValue)
             {
                 try
                 {
-                    int result = cat.Desactive(data);
+                    int result = im.Delete(data);
 
                     if (result > 0)
                         return Ok();

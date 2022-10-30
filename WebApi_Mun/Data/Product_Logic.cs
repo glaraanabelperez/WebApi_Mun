@@ -13,7 +13,7 @@ namespace WebApi_Mun.Data
     public class ProductLogic
     {
         internal static string connectionString = ConfigurationManager.ConnectionStrings["MundoConnection"].ConnectionString;
-      
+
         #region consulta
 
         /// <summary>
@@ -28,7 +28,7 @@ namespace WebApi_Mun.Data
             /// <summary>
             /// Nombre del producto
             /// </summary>
-            Name=1
+            Name = 1
 
         }
 
@@ -36,9 +36,9 @@ namespace WebApi_Mun.Data
         /// Clase para definir los valores de los filtros
         /// </summary>
         //[Serializable]
-        public class Filter   
+        public class Filter
         {
-      
+
 
             /// <summary>
             /// Filtro para el campo "Estado"
@@ -60,7 +60,7 @@ namespace WebApi_Mun.Data
             /// </summary>
             public int? MarcaId { get; set; }
 
-   
+
         }
 
         #endregion
@@ -71,13 +71,15 @@ namespace WebApi_Mun.Data
         ";SELECT A.ProductId, A.[Name] as ProductName,  A.[Description] " +
             " ,A.CategoryId_FK as CategoryId, o.[Name] as CategoryName, A.MarcaId_FK as MarcaId, mar.[Name] as MarcaName " +
             " ,A.Price, A.DiscountId_FK as DiscountId, dis.[Amount] DiscountAmount, A.State, A.Featured " +
-            " ,imp.ProductImageId, imp.ImageId_FK as ImageId, img.[Name] as ImageName" +
+            " ,img.[Name] as ImageName" +
             " ,A.CreatedBy_FK as UserId" +
             " FROM Products AS A " +
             " INNER JOIN dbo.Categories O ON O.CategoryId = A.CategoryId_FK " +
             " INNER JOIN [dbo].[Marcas] mar on A.MarcaId_FK= mar.MarcaId" +
             " left JOIN [dbo].[Discounts] dis on A.DiscountId_FK= dis.DiscountId" +
-            " left JOIN [dbo].[ProductImage] imp on imp.ProductId_FK= A.ProductId" +
+            " left JOIN [dbo].[ProductImage] imp on A.ProductId= (" +
+            "select top 1 ProductId_FK from [dbo].[ProductImage]" +
+            ")" +
             " left JOIN [dbo].[Images] img on img.ImageId= imp.ImageId_FK" +
             " {2} " +
             " ORDER BY {0} {1} ";
@@ -97,7 +99,8 @@ namespace WebApi_Mun.Data
         /// <param name="filter">Filtros a utilizar</param>
         /// <param name="recordCount">Cantidad de registros encontrados con los filtros establecidos</param>
         /// <returns>Registros obtenidos con los filtros y orden seleccionados</returns>
-        public DataTableModel List(OrderFields? orderField, bool? orderAscendant, Filter filter, int? from, int? length, out int recordCount){
+        public DataTableModel List(OrderFields? orderField, bool? orderAscendant, Filter filter, int? from, int? length, out int recordCount)
+        {
 
             if (from.HasValue != length.HasValue)
                 throw new ArgumentOutOfRangeException(nameof(from));
@@ -113,48 +116,48 @@ namespace WebApi_Mun.Data
 
             using (var connection = new SqlConnection(connectionString))
             {
-              SqlCommand objSqlCmd = new SqlCommand("", connection);
-              
-              string strFilter = string.Empty;
-              if (filter != null)
+                SqlCommand objSqlCmd = new SqlCommand("", connection);
+
+                string strFilter = string.Empty;
+                if (filter != null)
+                {
+                    if (filter.CategoryId.HasValue)
                     {
-                        if (filter.CategoryId.HasValue)
-                        {
-                            strFilter += " AND [A].CategoryId_FK=@Id_Category";
-                            objSqlCmd.Parameters.Add("@Id_Category", SqlDbType.Int).Value = filter.CategoryId.Value;
+                        strFilter += " AND [A].CategoryId_FK=@Id_Category";
+                        objSqlCmd.Parameters.Add("@Id_Category", SqlDbType.Int).Value = filter.CategoryId.Value;
 
-                        }
-                        if (filter.MarcaId.HasValue)
-                        {
-                            strFilter += " AND [A].MarcaId_FK=@Id_Marca";
-                            objSqlCmd.Parameters.Add("@Id_Marca", SqlDbType.Int).Value = filter.MarcaId.Value;
-
-                        }
-                        if (filter.State.HasValue)
-                        {
-                            strFilter += " AND [A].State = @State";
-                            objSqlCmd.Parameters.Add("@State", SqlDbType.Decimal).Value = filter.State.Value;
-                        }
-                        if (filter.Featured.HasValue)
-                        {
-                            strFilter += " AND [A].Featured = @Featured";
-                            objSqlCmd.Parameters.Add("@Featured", SqlDbType.Bit).Value = filter.Featured.Value;
-                        }
-                        //if (!string.IsNullOrWhiteSpace(filter.FreeText))
-                        //{
-                        //    strFilter += " AND CONTAINS(R.*, @FreeText )";
-                        //    objSqlCmd.Parameters.Add("@FreeText", SqlDbType.NVarChar, 1000).Value = filter.FreeText;
-                        //}
-
-
-                        if (!string.IsNullOrWhiteSpace(strFilter))
-                            strFilter = " WHERE " + strFilter.Substring(5);
                     }
+                    if (filter.MarcaId.HasValue)
+                    {
+                        strFilter += " AND [A].MarcaId_FK=@Id_Marca";
+                        objSqlCmd.Parameters.Add("@Id_Marca", SqlDbType.Int).Value = filter.MarcaId.Value;
 
-              string strWithParams = string.Format(SELECT_ALL, strOrderField, !orderAscendant.HasValue || orderAscendant.Value ? "ASC" : "DESC", strFilter);
-              objSqlCmd.CommandType = CommandType.Text;
+                    }
+                    if (filter.State.HasValue)
+                    {
+                        strFilter += " AND [A].State = @State";
+                        objSqlCmd.Parameters.Add("@State", SqlDbType.Decimal).Value = filter.State.Value;
+                    }
+                    if (filter.Featured.HasValue)
+                    {
+                        strFilter += " AND [A].Featured = @Featured";
+                        objSqlCmd.Parameters.Add("@Featured", SqlDbType.Bit).Value = filter.Featured.Value;
+                    }
+                    //if (!string.IsNullOrWhiteSpace(filter.FreeText))
+                    //{
+                    //    strFilter += " AND CONTAINS(R.*, @FreeText )";
+                    //    objSqlCmd.Parameters.Add("@FreeText", SqlDbType.NVarChar, 1000).Value = filter.FreeText;
+                    //}
 
-              connection.Open();
+
+                    if (!string.IsNullOrWhiteSpace(strFilter))
+                        strFilter = " WHERE " + strFilter.Substring(5);
+                }
+
+                string strWithParams = string.Format(SELECT_ALL, strOrderField, !orderAscendant.HasValue || orderAscendant.Value ? "ASC" : "DESC", strFilter);
+                objSqlCmd.CommandType = CommandType.Text;
+
+                connection.Open();
 
                 if (from.HasValue)
                 {
@@ -186,46 +189,35 @@ namespace WebApi_Mun.Data
                 //lista para devolver los datos mapeados ProductModelList
                 List<ProductModelDto> productList = new List<ProductModelDto>();
 
-                 
-                 foreach (DataRow row in dataset.Tables[1].Rows)
-                 {
-                     ProductImageModel im = new ProductImageModel();
-                         im.ProductImageId = Convert.ToInt32(row["ProductImageId"]);
-                         im.ProductId = Convert.ToInt32(row["ProductId"]);
-                         im.ImageId = Convert.ToInt32(row["ImageId "]);
-                         im.Name = Convert.ToString(row["ImageId "]);
 
-                     if (productList.Exists(p => p.ProductId == Convert.ToInt32(row["ProductId"])) == true)
-                     {
-                         productList.Find(p => p.ProductId == Convert.ToInt32(row["ProductId"])).images.Add(im);
-                     }
-                     else
-                     {
+                foreach (DataRow row in dataset.Tables[1].Rows)
+                {
+                    
                         ProductModelDto product = new ProductModelDto();
-                            product.ProductId = Convert.ToInt32(row["ProductId"]);
-                            product.Name= Convert.ToString(row["Name "]);
-                            product.Description= Convert.ToString(row["Description "]);
-                            product.CategoryName= Convert.ToString(row["CategoryName "]);
-                            product.MarcaName= Convert.ToString(row["MarcaName "]);
-                            product.DiscountAmount= Convert.ToDouble(row["DiscountAmount "]);
-                            product.State= Convert.ToBoolean(row["State "]);
-                            product.Featured= Convert.ToBoolean(row["Featured "]);
-                            product.images.Add(im);
-                            productList.Add(product);
-                     }
+                        product.ProductId = Convert.ToInt32(row["ProductId"]);
+                        product.Name = Convert.ToString(row["Name "]);
+                        product.Description = Convert.ToString(row["Description "]);
+                        product.CategoryName = Convert.ToString(row["CategoryName "]);
+                        product.MarcaName = Convert.ToString(row["MarcaName "]);
+                        product.DiscountAmount = Convert.ToInt32(row["DiscountAmount "]);
+                        product.State = Convert.ToBoolean(row["State "]);
+                        product.Featured = Convert.ToBoolean(row["Featured "]);
+                        product.ImageName= Convert.ToString(row["ImageName "]);
+                    productList.Add(product);
+                    
 
-                 }             
+                }
 
-                 connection.Close();
-                 return (new DataTableModel()
-                     {
-                         RecordsCount = recordCount,
-                         Data = productList
-                     });
-              
-                
+                connection.Close();
+                return (new DataTableModel()
+                {
+                    RecordsCount = recordCount,
+                    Data = productList
+                });
+
+
             }
-             
+
         }
 
         /// <summary>
@@ -260,7 +252,7 @@ namespace WebApi_Mun.Data
                         items.MarcaId = objDR.GetInt32(1);
                         items.DiscountId = objDR.GetInt32(1);
                         items.Price = (double)objDR.GetDecimal(9);
-                        items.State = objDR.GetByte(3) == 0 ? false : true;                               
+                        items.State = objDR.GetByte(3) == 0 ? false : true;
                         items.Featured = objDR.GetByte(10) == 0 ? false : true;
                         items.CreatedBy = objDR.GetInt32(2);
 
@@ -271,7 +263,7 @@ namespace WebApi_Mun.Data
                 {
                     throw e;
                 }
-               
+
             }
 
 
@@ -286,14 +278,14 @@ namespace WebApi_Mun.Data
         public int Save(ProductModel data)
         {
             using (var connection = new SqlConnection(connectionString))
-            {   
+            {
                 var store = "";
                 if (data.ProductId.HasValue && data.ProductId.Value != 0)
                     store = "Product_Update";
                 else
                     store = "Product_Add";
 
-                 using(SqlCommand objCmd = new SqlCommand(store, connection))
+                using (SqlCommand objCmd = new SqlCommand(store, connection))
                 {
                     if (store.Equals("Product_Update"))
                         objCmd.Parameters.Add("@ProductId", SqlDbType.Int).Value = data.ProductId;
@@ -313,7 +305,7 @@ namespace WebApi_Mun.Data
 
                     return result;
                 }
-                
+
             }
 
         }

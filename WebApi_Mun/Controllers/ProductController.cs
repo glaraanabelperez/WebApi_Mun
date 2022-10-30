@@ -103,7 +103,38 @@ namespace WebApi_Mun.Controllers
 
         }
 
-    
-  }    
+
+        /// <summary>
+        /// Cambia el estado de la marca
+        /// </summary>
+        /// <param name="data">Datos del estado</param>
+        /// <returns><c>1</c> Si se guardaron los datos</returns>
+        [Route("api/product/state/")]
+        [HttpPost]
+        public IHttpActionResult ChangeState([FromBody] StateModel data)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    int result = prodLogic.Desactive(data);
+
+                    if (result > 0)
+                        return Ok();
+                    else
+                        return BadRequest("El elemento a editar no existe");
+
+                }
+                catch (Exception ex)
+                {
+                    return Content(HttpStatusCode.InternalServerError, ex.Message);
+                }
+            }
+
+            return BadRequest("El modelo de datos esta incorrecto o vacio");
+        }
+
+
+    }
 
 }
