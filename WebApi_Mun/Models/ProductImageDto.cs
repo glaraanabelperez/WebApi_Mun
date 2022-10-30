@@ -6,13 +6,24 @@ using System.Web;
 
 namespace WebApi_Mun.Models
 {
-    public class ImageModel
+    public class ProductImageDto
     {
 
         /// <summary>
-        /// Identificador Imagen
+        /// Identificador Categoria
+        /// </summary>
+        public int? ProductImageId { get; set; }
+
+        /// <summary>
+        /// Identificador Categoria
         /// </summary>
         public int? ImageId { get; set; }
+
+
+        /// <summary>
+        /// Identificador Categoria
+        /// </summary>
+        public int? ProductId { get; set; }
 
 
         /// <summary>

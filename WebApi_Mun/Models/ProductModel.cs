@@ -39,6 +39,7 @@ namespace WebApi_Mun.Models
         /// </summary>
         public double? Price { get; set; }
 
+
         /// <summary>
         /// Codigo descuento
         /// </summary>
@@ -58,6 +59,8 @@ namespace WebApi_Mun.Models
         /// usuario vinculado
         /// </summary>
         public int CreatedBy { get; set; }
+
+
 
 
     }
@@ -93,7 +96,8 @@ namespace WebApi_Mun.Models
         /// <summary>
         /// monto descuento
         /// </summary>
-        public double? DiscountAmount { get; set; }
+        public int? DiscountAmount { get; set; }
+
         /// <summary>
         /// Estado
         /// </summary>
@@ -105,9 +109,16 @@ namespace WebApi_Mun.Models
         public bool? Featured { get; set; }
 
         /// <summary>
-        /// Imagenes Vinculadas
+        /// Precio
         /// </summary>
-        public List<ProductImageModel> images { get; set; } = new List<ProductImageModel>();
+        public double? Price { get; set; }
+
+        /// <summary>
+        /// Imagen destacada
+        /// </summary>
+        public string ImageName { get; set; }
+
+  
 
     }
 }

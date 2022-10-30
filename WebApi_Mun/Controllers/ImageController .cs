@@ -9,27 +9,23 @@ using WebApi_Mun.Models;
 namespace WebApi_Mun.Controllers
 {
     [EnableCors(origins: "http://localhost:4200", headers: "*", methods: "*")]
-    public class DiscountController : ApiController
+    public class ImageController : ApiController
     {
-        public DiscountLogic dis = new DiscountLogic();
+        public ImageLogic cat = new ImageLogic();
 
         /// <summary>
-        /// Listado de todos los descuentos
+        /// Listado de todas las categorias segun usuario
         /// </summary>
-        [Route("api/discount/list/")]
+        [Route("api/category/list/")]
         [HttpGet]
         public IHttpActionResult GetAll()
         {
             try
             {
-                var list = dis.List();
-                if (list == null)
-                {
-                    return NotFound();
-                }
-
+                //List<ProductModel> orderDToList;
+                
+                var list = cat.List();
                 return Ok(list);
-
             }
             catch (Exception ex)
             {
@@ -38,16 +34,16 @@ namespace WebApi_Mun.Controllers
         }
 
         /// <summary>
-        /// Listado de todos los descuentos activos
+        /// Listado de todas las categorias activas
         /// </summary>
-        [Route("api/discount/listActive/")]
+        [Route("api/category/listActive/")]
         [HttpGet]
         public IHttpActionResult GetAllActive()
         {
             try
             {
-                var list = dis.ListActive();
-                if (list == null)
+                var list = cat.ListActive();
+                if (list == null || list.Length == 0)
                 {
                     return NotFound();
                 }
@@ -61,16 +57,17 @@ namespace WebApi_Mun.Controllers
             }
         }
 
+
         /// <summary>
-        /// Devuelve los datos de un descuento
+        /// Devuelve los datos de un categoria
         /// </summary>
-        /// <param name="categoryId">Identificador del desc</param>
-        /// <returns>Datos del descuento</returns>
-        [Route("api/discount/{discountId}")]
+        /// <param name="categoryId">Identificador del categoria</param>
+        /// <returns>Datos del categoria</returns>
+        [Route("api/category/{categoryId}/")]
         [HttpGet]
-        public IHttpActionResult Get(int discountId)
+        public IHttpActionResult Get(int categoryId)
         {
-            var userItem = dis.Get(discountId);
+            var userItem = cat.Get(categoryId);
             if (userItem == null)
             {
                 return NotFound();
@@ -79,19 +76,41 @@ namespace WebApi_Mun.Controllers
         }
 
         /// <summary>
-        /// Graba los datos del descuento 
+        /// Graba los datos del categoria
         /// </summary>
-        /// <param name="data">Datos del descuento</param>
+        /// <param name="data">Datos del categoria</param>
         /// <returns><c>true</c> Si se guardaron los datos</returns>
         [HttpPut]
-        public IHttpActionResult Put([FromBody] DiscountModel data)
+        public IHttpActionResult Put([FromBody] CategoryModel data)
         {
-
+          
             if (ModelState.IsValid)
             {
                 try
                 {
-                    var result = dis.Save(data);
+                    cat.Save(data);
+                    return Ok();
+                }
+                catch (Exception ex)
+                {
+                    return Content(HttpStatusCode.InternalServerError, ex.Message);
+                }        
+            }
+            return BadRequest("El modelo de datos esta incorrecto o vacio");
+        }
+
+
+        [HttpPost]
+        public IHttpActionResult Update([FromBody] CategoryModel data)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var result = cat.Save(data);
+                    if (result < 0)
+                        return Content(HttpStatusCode.NotFound, "El dato a editar no existe");
+                    
                     return Ok();
                 }
                 catch (Exception ex)
@@ -103,55 +122,21 @@ namespace WebApi_Mun.Controllers
             return BadRequest("El modelo de datos esta incorrecto o vacio");
         }
 
-        /// <summary>
-        /// Actualiza los datos del descuento
-        /// </summary>
-        /// <param name="data">Datos del decsuento</param>
-        /// <returns><c>true</c> Si se guardaron los datos</returns>
-        [Route("api/discount/{discountId}")]
-        [HttpPost]
-        public IHttpActionResult Post([FromBody] DiscountModel data)
-        {
 
+        /// <summary>
+        /// Cambia el estado de la marca
+        /// </summary>
+        /// <param name="data">Datos del estado</param>
+        /// <returns><c>1</c> Si se guardaron los datos</returns>
+        [Route("api/category/state/")]
+        [HttpPost]
+        public IHttpActionResult ChangeState([FromBody] StateModel data)
+        {
             if (ModelState.IsValid)
             {
                 try
                 {
-                    int result = dis.Save(data);
-                    if (result > 0)
-                    {
-                        return Ok();
-                    }
-                    else
-                    {
-
-                        return BadRequest("El elemento a editar no existe");
-                    }
-
-                }
-                catch (Exception ex)
-                {
-                    return Content(HttpStatusCode.InternalServerError, ex.Message);
-                }
-            }
-            
-            return BadRequest("El modelo de datos esta incorrecto o vacio");
-        }
-
-        /// <summary>
-        /// Cambia el estado del descuento
-        /// </summary>
-        /// <param name="data">Datos del descuento</param>
-        /// <returns><c>1</c> Si se guardaron los datos</returns>
-        [Route("api/discount/state/")]
-        [HttpPost]
-        public IHttpActionResult ChangeState([FromBody] StateModel data)
-        {
-            if (ModelState.IsValid )
-            {
-                try
-                {
-                    int result = dis.Desactive(data);
+                    int result = cat.Desactive(data);
 
                     if (result > 0)
                         return Ok();
@@ -163,9 +148,10 @@ namespace WebApi_Mun.Controllers
                     return Content(HttpStatusCode.InternalServerError, ex.Message);
                 }
             }
-            
+           
             return BadRequest("El modelo de datos esta incorrecto o vacio");
         }
+
 
     }
 }

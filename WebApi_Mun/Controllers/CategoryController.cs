@@ -43,7 +43,7 @@ namespace WebApi_Mun.Controllers
             try
             {
                 var list = cat.ListActive();
-                if (list == null)
+                if (list == null || list.Length == 0)
                 {
                     return NotFound();
                 }
@@ -63,6 +63,7 @@ namespace WebApi_Mun.Controllers
         /// </summary>
         /// <param name="categoryId">Identificador del categoria</param>
         /// <returns>Datos del categoria</returns>
+        [Route("api/category/{categoryId}/")]
         [HttpGet]
         public IHttpActionResult Get(int categoryId)
         {
