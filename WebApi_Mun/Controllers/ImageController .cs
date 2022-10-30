@@ -16,15 +16,15 @@ namespace WebApi_Mun.Controllers
         /// <summary>
         /// Listado de todas las categorias segun usuario
         /// </summary>
-        [Route("api/imageByProduct/")]
+        [Route("api/image/{productId}")]
         [HttpGet]
-        public IHttpActionResult GetAll()
+        public IHttpActionResult GetByProduct(int productId)
         {
             try
             {
                 //List<ProductModel> orderDToList;
                 
-                var list = im.ListByProduct();
+                var list = im.ListByProduct(productId);
                 return Ok(list);
             }
             catch (Exception ex)

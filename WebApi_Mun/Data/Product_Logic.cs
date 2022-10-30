@@ -195,14 +195,15 @@ namespace WebApi_Mun.Data
                     
                         ProductModelDto product = new ProductModelDto();
                         product.ProductId = Convert.ToInt32(row["ProductId"]);
-                        product.Name = Convert.ToString(row["Name "]);
-                        product.Description = Convert.ToString(row["Description "]);
-                        product.CategoryName = Convert.ToString(row["CategoryName "]);
-                        product.MarcaName = Convert.ToString(row["MarcaName "]);
-                        product.DiscountAmount = Convert.ToInt32(row["DiscountAmount "]);
-                        product.State = Convert.ToBoolean(row["State "]);
-                        product.Featured = Convert.ToBoolean(row["Featured "]);
-                        product.ImageName= Convert.ToString(row["ImageName "]);
+                        product.Name = Convert.ToString(row["ProductName"]);
+                        product.Description = Convert.ToString(row["Description"]);
+                        product.CategoryName = Convert.ToString(row["CategoryName"]);
+                        product.MarcaName = Convert.ToString(row["MarcaName"]);
+                        if(!row.IsNull("DiscountAmount"))
+                            product.DiscountAmount = Convert.ToInt32(row["DiscountAmount"]);
+                        product.State = Convert.ToBoolean(row["State"]);
+                        product.Featured = Convert.ToBoolean(row["Featured"]);
+                        product.ImageName= Convert.ToString(row["ImageName"]);
                     productList.Add(product);
                     
 
@@ -246,15 +247,15 @@ namespace WebApi_Mun.Data
                         }
 
                         items.ProductId = objDR.GetInt32(0);
-                        items.Name = objDR.GetString(5);
-                        items.Description = objDR.GetString(5);
-                        items.CategoryId = objDR.GetInt32(1);
-                        items.MarcaId = objDR.GetInt32(1);
-                        items.DiscountId = objDR.GetInt32(1);
-                        items.Price = (double)objDR.GetDecimal(9);
-                        items.State = objDR.GetByte(3) == 0 ? false : true;
-                        items.Featured = objDR.GetByte(10) == 0 ? false : true;
-                        items.CreatedBy = objDR.GetInt32(2);
+                        items.Name = objDR.GetString(1);
+                        items.Description = objDR.GetString(2);
+                        items.CategoryId = objDR.GetInt32(3);
+                        items.MarcaId = objDR.GetInt32(4);
+                        if(!objDR.IsDBNull(5))
+                            items.DiscountId = objDR.GetInt32(5);
+                        items.Price = (double)objDR.GetDecimal(6);
+                        items.State = objDR.GetByte(7) == 0 ? false : true;
+                        items.Featured = objDR.GetByte(8) == 0 ? false : true;
 
                         return items;
                     }

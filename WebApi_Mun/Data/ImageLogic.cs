@@ -17,7 +17,7 @@ namespace WebApi_Mun.Data
         /// Devuelve todos las imagenes segun el producto
         /// </summary>
         /// <returns>Lista de marcas</returns>
-        public ProductImageDto[] ListByProduct()
+        public ProductImageDto[] ListByProduct(int productId)
         {
             var items = new List<ProductImageDto>();
             using (var connection = new SqlConnection(connectionString))
@@ -25,9 +25,9 @@ namespace WebApi_Mun.Data
                 using (var objCmd = new SqlCommand("Image_GetByProduct", connection))
                 {
                     connection.Open();
+                    objCmd.Parameters.Add("@ProductId", SqlDbType.Int).Value = productId;
                     objCmd.CommandType = CommandType.StoredProcedure;
                     SqlDataReader objDR = objCmd.ExecuteReader();
-                    var count = 0;
                     while (objDR.Read())
                     {
                         var c = new ProductImageDto();

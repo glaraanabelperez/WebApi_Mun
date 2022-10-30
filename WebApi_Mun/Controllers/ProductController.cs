@@ -28,7 +28,7 @@ namespace WebApi_Mun.Controllers
                 {
                     return Content(HttpStatusCode.NotFound, "La solicitud no arroja resultados");
                 }
-                return Ok();
+                return Ok(prod);
             }
             catch (Exception ex)
             {
