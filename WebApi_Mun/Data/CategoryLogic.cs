@@ -153,9 +153,12 @@ namespace WebApi_Mun.Data
         /// </summary>
         /// <param name="data">Datos de la entidad</param>
         /// <returns><c>true</c> Si se guardaron los datos</returns>
-        public int Desactive(StateModel data)
+        public int Delete(int categoryId)
         {
-            string queryString = string.Format("update Categories set [State]={0} where CategoryId= {1}", data.State ? 1 : 0, data.ItemId);
+
+            string queryString = string.Format("if((" +
+                "select CategoryId_FK from Products where CategoryId_FK={0}" +
+                ")is null) begin delete from Categories  where CategoryId= {1} end else begin return -2 end", categoryId, categoryId);
             using (var connection = new SqlConnection(connectionString))
             {
                 using (var objCmd = new SqlCommand(queryString, connection))

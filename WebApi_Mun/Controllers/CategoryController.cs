@@ -128,15 +128,14 @@ namespace WebApi_Mun.Controllers
         /// </summary>
         /// <param name="data">Datos del estado</param>
         /// <returns><c>1</c> Si se guardaron los datos</returns>
-        [Route("api/category/state/")]
-        [HttpPost]
-        public IHttpActionResult ChangeState([FromBody] StateModel data)
+        [Route("api/category/{categoryId}")]
+        [HttpDelete]
+        public IHttpActionResult Delete( int categoryId)
         {
-            if (ModelState.IsValid)
-            {
+         
                 try
                 {
-                    int result = cat.Desactive(data);
+                    int result = cat.Delete(categoryId);
 
                     if (result > 0)
                         return Ok();
@@ -147,9 +146,7 @@ namespace WebApi_Mun.Controllers
                 {
                     return Content(HttpStatusCode.InternalServerError, ex.Message);
                 }
-            }
            
-            return BadRequest("El modelo de datos esta incorrecto o vacio");
         }
 
 
