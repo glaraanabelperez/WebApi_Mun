@@ -73,7 +73,7 @@ namespace WebApi_Mun.Models
         public int? ProductId { get; set; }
 
         /// <summary>
-        /// Identificador nombre dle producto
+        /// Identificador nombre del producto
         /// </summary>
         public string Name { get; set; }
 

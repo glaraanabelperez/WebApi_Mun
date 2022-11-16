@@ -17,13 +17,13 @@ namespace WebApi_Mun.Models
         /// <summary>
         /// Identificador Categoria
         /// </summary>
-        public int? ImageId { get; set; }
+        public int ImageId { get; set; }
 
 
         /// <summary>
         /// Identificador Categoria
         /// </summary>
-        public int? ProductId { get; set; }
+        public int ProductId { get; set; }
 
 
         /// <summary>
@@ -34,5 +34,16 @@ namespace WebApi_Mun.Models
 
     }
 
+    public class ImageRequest
+    {
+ 
+        /// <summary>
+        /// Nombre
+        /// </summary>
+        public string Name { get; set; }
 
+        public byte[] File { get; set; }
+
+
+    }
 }

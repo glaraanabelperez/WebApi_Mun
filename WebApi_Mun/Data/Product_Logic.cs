@@ -285,47 +285,68 @@ namespace WebApi_Mun.Data
                     store = "Product_Update";
                 else
                     store = "Product_Add";
+                var objCmd = new SqlCommand(store, connection);
 
-                using (SqlCommand objCmd = new SqlCommand(store, connection))
-                {
-                    if (store.Equals("Product_Update"))
-                        objCmd.Parameters.Add("@ProductId", SqlDbType.Int).Value = data.ProductId;
-                    objCmd.CommandType = CommandType.StoredProcedure;
-                    objCmd.Parameters.Add("@CategoryId", SqlDbType.Int).Value = data.CategoryId;
-                    objCmd.Parameters.Add("@MarcaId", SqlDbType.Int).Value = data.MarcaId;
-                    objCmd.Parameters.Add("@DiscountId", SqlDbType.Int).Value = data.DiscountId;
-                    objCmd.Parameters.Add("@Name", SqlDbType.VarChar, 250).Value = data.Name;
-                    objCmd.Parameters.Add("@Description", SqlDbType.VarChar, 250).Value = data.Description;
-                    objCmd.Parameters.Add("@Featured", SqlDbType.TinyInt).Value = (data.Featured == true ? 1 : 0);
-                    objCmd.Parameters.Add("@State", SqlDbType.TinyInt).Value = (data.State == true ? 1 : 0);
-                    objCmd.Parameters.Add("@Price", SqlDbType.Money).Value = data.Price;
+                if (store.Equals("Product_Update"))
+                    objCmd.Parameters.Add("@ProductId", SqlDbType.Int).Value = data.ProductId;
+                objCmd.CommandType = CommandType.StoredProcedure;
+                objCmd.Parameters.Add("@CategoryId", SqlDbType.Int).Value = data.CategoryId;
+                objCmd.Parameters.Add("@MarcaId", SqlDbType.Int).Value = data.MarcaId;
+                objCmd.Parameters.Add("@DiscountId", SqlDbType.Int).Value = data.DiscountId;
+                objCmd.Parameters.Add("@Name", SqlDbType.VarChar, 250).Value = data.Name;
+                objCmd.Parameters.Add("@Description", SqlDbType.VarChar, 250).Value = data.Description;
+                objCmd.Parameters.Add("@Featured", SqlDbType.TinyInt).Value = (data.Featured == true ? 1 : 0);
+                objCmd.Parameters.Add("@State", SqlDbType.TinyInt).Value = (data.State == true ? 1 : 0);
+                objCmd.Parameters.Add("@Price", SqlDbType.Money).Value = data.Price;
 
 
-                    connection.Open();
-                    var result = objCmd.ExecuteNonQuery();
+                //var result = objCmd.ExecuteNonQuery();
 
-                    return result;
-                }
-
+               var result=0;
+               try
+               {
+                   connection.Open();
+                   using (var objDR = objCmd.ExecuteReader(CommandBehavior.SingleRow))
+                   {
+                       if (!objDR.Read())
+                       {
+                           return 0;
+                       }
+                   result = objDR.GetInt32(0);
+                   objDR.Close();
+                   connection.Close();
+                       
+                   return result;
+                      
+                   }
+               }
+               catch (Exception e)
+               {
+                  throw e;
+               }
             }
 
         }
 
-        public int Desactive(StateModel data)
+        public int Desactive(int itemId)
         {
-            string queryString = string.Format("update Products set [State]={0} where ProductId= {1}", data.State ? 1 : 0, data.ItemId);
             using (var connection = new SqlConnection(connectionString))
             {
-                using (var objCmd = new SqlCommand(queryString, connection))
+                SqlCommand objCmd;
+                var store = "";
+                store = "Product_Desactive";
+                objCmd = new SqlCommand(store, connection);
+
+                using (objCmd = new SqlCommand(store, connection))
                 {
+                    objCmd.Parameters.Add("@ProductId", SqlDbType.Int).Value = itemId;
+
                     connection.Open();
                     var result = objCmd.ExecuteNonQuery();
-                    connection.Close();
+
                     return result;
                 }
             }
-
-
         }
 
     }

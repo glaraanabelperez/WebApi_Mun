@@ -32,7 +32,6 @@ namespace WebApi_Mun.Data
                         var c = new CategoryModel();
                         c.CategoryId = objDR.GetInt32(0);
                         c.Name = objDR.GetString(1);
-                        c.State = objDR.GetBoolean(2);
 
                         items.Add(c);
                     }
@@ -63,7 +62,6 @@ namespace WebApi_Mun.Data
                         var c = new CategoryModel();
                         c.CategoryId = objDR.GetInt32(0);
                         c.Name = objDR.GetString(1);
-                        c.State = objDR.GetByte(2) == 1 ? true : false;
 
                         items.Add(c);
                     }
@@ -99,7 +97,6 @@ namespace WebApi_Mun.Data
 
                         items.CategoryId = objDR.GetInt32(0);
                         items.Name = objDR.GetString(1);
-                        items.State = objDR.GetBoolean(1);
 
                     }
                 }
@@ -135,7 +132,6 @@ namespace WebApi_Mun.Data
 
                     objCmd.CommandType = CommandType.StoredProcedure;
                     objCmd.Parameters.Add("@Name", SqlDbType.Char, 5).Value = data.Name;
-                    objCmd.Parameters.Add("@State", SqlDbType.Char, 5).Value = data.State;
 
                     connection.Open();
                     var result = objCmd.ExecuteNonQuery();
@@ -153,21 +149,28 @@ namespace WebApi_Mun.Data
         /// </summary>
         /// <param name="data">Datos de la entidad</param>
         /// <returns><c>true</c> Si se guardaron los datos</returns>
-        public int Delete(int categoryId)
+        public int Desactive(int categoryId)
         {
 
-            string queryString = string.Format("if((" +
-                "select CategoryId_FK from Products where CategoryId_FK={0}" +
-                ")is null) begin delete from Categories  where CategoryId= {1} end else begin return -2 end", categoryId, categoryId);
             using (var connection = new SqlConnection(connectionString))
             {
-                using (var objCmd = new SqlCommand(queryString, connection))
+
+                SqlCommand objCmd;
+                var store = "";
+
+                store = "Category_Desactive";
+                objCmd = new SqlCommand(store, connection);
+
+                using (objCmd = new SqlCommand(store, connection))
                 {
+                    objCmd.Parameters.Add("@CategoryId", SqlDbType.Int).Value = categoryId;
+               
                     connection.Open();
                     var result = objCmd.ExecuteNonQuery();
-                    connection.Close();
+
                     return result;
                 }
+
             }
 
 

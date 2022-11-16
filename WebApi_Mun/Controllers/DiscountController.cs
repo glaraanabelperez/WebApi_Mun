@@ -143,28 +143,24 @@ namespace WebApi_Mun.Controllers
         /// </summary>
         /// <param name="data">Datos del descuento</param>
         /// <returns><c>1</c> Si se guardaron los datos</returns>
-        [Route("api/discount/state/")]
-        [HttpPost]
-        public IHttpActionResult ChangeState([FromBody] StateModel data)
+        [Route("api/discount/state/{itemId}")]
+        [HttpDelete]
+        public IHttpActionResult ChangeState(int itemId)
         {
-            if (ModelState.IsValid )
-            {
-                try
-                {
-                    int result = dis.Desactive(data);
 
-                    if (result > 0)
-                        return Ok();
-                    else
-                        return BadRequest("El elemento a editar no existe");
-                }
-                catch (Exception ex)
-                {
-                    return Content(HttpStatusCode.InternalServerError, ex.Message);
-                }
+            try
+            {
+                int result = dis.Desactive(itemId);
+
+                if (result > 0)
+                    return Ok();
+                else
+                    return BadRequest("El elemento no puede eliminarse");
             }
-            
-            return BadRequest("El modelo de datos esta incorrecto o vacio");
+            catch (Exception ex)
+            {
+                return Content(HttpStatusCode.InternalServerError, ex.Message);
+            }
         }
 
     }

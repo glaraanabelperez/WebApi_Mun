@@ -151,21 +151,29 @@ namespace WebApi_Mun.Data
            
         }
 
-        public int Desactive(StateModel data)
+        public int Desactive(int itemId)
         {
-            string queryString = string.Format("update Discounts set [State]={0} where DiscountId= {1}", data.State ? 1: 0, data.ItemId);
+
             using (var connection = new SqlConnection(connectionString))
             {
-                using (var objCmd = new SqlCommand(queryString, connection))
+
+                SqlCommand objCmd;
+                var store = "";
+
+                store = "Discount_Desactive";
+                objCmd = new SqlCommand(store, connection);
+
+                using (objCmd = new SqlCommand(store, connection))
                 {
+                    objCmd.Parameters.Add("@DiscountId", SqlDbType.Int).Value = itemId;
+
                     connection.Open();
-                    var result =objCmd.ExecuteNonQuery();
-                    connection.Close();
+                    var result = objCmd.ExecuteNonQuery();
+
                     return result;
                 }
-            }
-           
 
+            }
         }
 
     }

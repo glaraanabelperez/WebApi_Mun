@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
-
+using System.IO;
 using WebApi_Mun.Models;
 
 namespace WebApi_Mun.Data
@@ -59,12 +59,12 @@ namespace WebApi_Mun.Data
 
                 SqlCommand objCmd;
                 var store = "";
-                if (data.ImageId.HasValue && data.ImageId != 0)
+                if (data.ImageId != 0)
                 {
                     store = "Image_Update";
 
                 }
-                else if (data.ProductId.HasValue && data.ProductId != 0 && data.Name.Length>0)
+                else if (data.ProductId != 0 && data.Name.Length>0)
                 {
                     store = "Image_Add";
 
@@ -102,7 +102,7 @@ namespace WebApi_Mun.Data
 
                 SqlCommand objCmd;
                 var store = "";
-                if (data.ImageId.HasValue && data.ImageId != 0 && data.ProductId.HasValue && data.ProductId!=0)
+                if (data.ImageId != 0 && data.ProductId!=0)
                 {
                     store = "Image_Delete";
 
@@ -119,7 +119,27 @@ namespace WebApi_Mun.Data
                     connection.Open();
                     var result = objCmd.ExecuteNonQuery();
 
-                    return result;
+                    if (result > 0)
+                    {
+                        try{
+                            string ruta = @"C:\Users\Lara\source\repos\Colo\ClientMundoPanal\src\assets";
+                            if (!File.Exists(ruta + "\\" + data.Name))
+                            {
+                                System.IO.File.Delete(data.Name);
+                                return 1;
+                            }
+                            else
+                            {
+                                return -1;
+                            }
+                        }
+                        catch(Exception e){
+                            throw e;
+                        }
+                        
+                    }
+
+                    return -2;
                 }
 
             }

@@ -161,19 +161,31 @@ namespace WebApi_Mun.Data
         /// </summary>
         /// <param name="data">Datos de la entidad</param>
         /// <returns><c>true</c> Si se guardaron los datos</returns>
-        public int Desactive(StateModel data)
+        public int Desactive(int itemId)
         {
-            string queryString = string.Format("update Marcas set [State]={0} where MarcaId= {1}", data.State ? 1 : 0, data.ItemId);
+
             using (var connection = new SqlConnection(connectionString))
             {
-                using (var objCmd = new SqlCommand(queryString, connection))
+
+                SqlCommand objCmd;
+                var store = "";
+
+                store = "Marca_Desactive";
+                objCmd = new SqlCommand(store, connection);
+
+                using (objCmd = new SqlCommand(store, connection))
                 {
+                    objCmd.Parameters.Add("@MarcaId", SqlDbType.Int).Value = itemId;
+
                     connection.Open();
                     var result = objCmd.ExecuteNonQuery();
-                    connection.Close();
+
                     return result;
                 }
+
             }
+
+
         }
 
 

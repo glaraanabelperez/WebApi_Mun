@@ -108,9 +108,9 @@ namespace WebApi_Mun.Controllers
                 try
                 {
                     var result = cat.Save(data);
-                    if (result < 0)
+                    if (result <0)
                         return Content(HttpStatusCode.NotFound, "El dato a editar no existe");
-                    
+
                     return Ok();
                 }
                 catch (Exception ex)
@@ -128,19 +128,19 @@ namespace WebApi_Mun.Controllers
         /// </summary>
         /// <param name="data">Datos del estado</param>
         /// <returns><c>1</c> Si se guardaron los datos</returns>
-        [Route("api/category/{categoryId}")]
+        [Route("api/category/state/{categoryId}")]
         [HttpDelete]
-        public IHttpActionResult Delete( int categoryId)
+        public IHttpActionResult ChangeState( int categoryId)
         {
          
                 try
                 {
-                    int result = cat.Delete(categoryId);
+                    int result = cat.Desactive(categoryId);
 
                     if (result > 0)
                         return Ok();
                     else
-                        return BadRequest("El elemento a editar no existe");
+                        return BadRequest("El elemento no puede eliminarse");
                 }
                 catch (Exception ex)
                 {

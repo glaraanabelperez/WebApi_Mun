@@ -20,10 +20,6 @@ namespace WebApi_Mun.Models
         /// </summary>
         public string Name { get; set; }
 
-        /// <summary>
-        /// Estado
-        /// </summary>
-        public bool State { get; set; }
 
     }
 }
