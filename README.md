@@ -1,7 +1,7 @@
 
 
 # WebApi_Mun
-webApi .net framwork 4.7
+webApi .net framwork 4.7 con ado.net
 
 Install Package :
 Microsoft.AspNet.WebApi.Cors
