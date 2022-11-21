@@ -36,6 +36,28 @@ namespace WebApi_Mun.Controllers
             }
 }
 
+        /// <summary>
+        /// Listado de todas las marcas
+        /// </summary>
+        [Route("api/products/list_feature")]
+        [HttpGet]
+        public IHttpActionResult GetProductsFeatured()
+        {
+            try
+            {
+                var list = prodLogic.GetProductsFeatured();
+                if (list == null)
+                {
+                    return NotFound();
+                }
+
+                return Ok(list);
+            }
+            catch (Exception ex)
+            {
+                return Content(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
 
         /// <summary>
         /// Listado de todos los productos paginados y filtrados
@@ -86,7 +108,7 @@ namespace WebApi_Mun.Controllers
                 try
                 {
                     var prod = prodLogic.Save(data);
-                    if (prod < 0)
+                    if (prod <= 0)
                         return Content(HttpStatusCode.BadRequest, "Los datos solicitados no existen");
 
                     return Ok(prodLogic.Save(data));
@@ -108,7 +130,7 @@ namespace WebApi_Mun.Controllers
         /// </summary>
         /// <param name="data">Datos del estado</param>
         /// <returns><c>1</c> Si se guardaron los datos</returns>
-        [Route("api/discount/state/{itemId}")]
+        [Route("api/product/state/{itemId}")]
         [HttpDelete]
         public IHttpActionResult ChangeState(int itemId)
         {

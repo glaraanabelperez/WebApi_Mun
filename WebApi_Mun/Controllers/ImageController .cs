@@ -14,7 +14,7 @@ namespace WebApi_Mun.Controllers
     [EnableCors(origins: "http://localhost:4200", headers: "*", methods: "*")]
     public class ImageController : ApiController
     {
-        public ImageLogic im = new ImageLogic();
+        public ImageLogic imagenLogic = new ImageLogic();
 
         /// <summary>
         /// Listado de todas las categorias segun usuario
@@ -27,7 +27,7 @@ namespace WebApi_Mun.Controllers
             {
                 //List<ProductModel> orderDToList;
                 
-                var list = im.ListByProduct(productId);
+                var list = imagenLogic.ListByProduct(productId);
                 return Ok(list);
             }
             catch (Exception ex)
@@ -37,58 +37,11 @@ namespace WebApi_Mun.Controllers
         }
 
         /// <summary>
-        /// Graba los datos de una imagen
-        /// </summary>
-        /// <param name="data">Datos de la imagen</param>
-        /// <returns><c>true</c> Si se guardaron los datos</returns>
-        [Route("api/images/{imageId}")]
-        [HttpPut]
-        public IHttpActionResult Put([FromBody] ProductImageDto data)
-        {
-          
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    im.Save(data);
-                    return Ok();
-                }
-                catch (Exception ex)
-                {
-                    return Content(HttpStatusCode.InternalServerError, ex.Message);
-                }        
-            }
-            return BadRequest("El modelo de datos esta incorrecto o vacio");
-        }
-
-        [HttpPost]
-        public IHttpActionResult Update(int imageId, [FromBody] ProductImageDto data)
-        {
-            if (ModelState.IsValid && data.ProductImageId.HasValue && imageId == data.ProductImageId)
-            {
-                try
-                {
-                    var result = im.Save(data);
-                    if (result < 0)
-                        return Content(HttpStatusCode.NotFound, "El dato a editar no existe");
-                    
-                    return Ok();
-                }
-                catch (Exception ex)
-                {
-                    return Content(HttpStatusCode.InternalServerError, ex.Message);
-                }
-            }
-            
-            return BadRequest("El modelo de datos esta incorrecto o vacio");
-        }
-
-        /// <summary>
         /// Borra la imagen
         /// </summary>
         /// <param name="data">Datos de la imagen</param>
         /// <returns><c>1</c> Si se guardaron los datos</returns>
-        [Route("api/images/state/")]
+        [Route("api/images/delete")]
         [HttpPost]
         public IHttpActionResult DeleteImage([FromBody] ProductImageDto data)
         {
@@ -96,12 +49,17 @@ namespace WebApi_Mun.Controllers
             {
                 try
                 {
-                    int result = im.Delete(data);
-
-                    if (result > 0)
-                        return Ok();
+                    string ruta = @"C:\Users\Lara\source\repos\Colo\ClientMundoPanal\src\assets";
+                    int result = imagenLogic.Delete(data);
+                    if (File.Exists(ruta + "\\" + data.Name) && result > 0)
+                    {
+                        System.IO.File.Delete(data.Name);
+                        return Ok();                   
+                    }
                     else
+                    {
                         return BadRequest("El elemento a editar no existe");
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -134,17 +92,27 @@ namespace WebApi_Mun.Controllers
             return InternalServerError();
         }
 
-        [Route("api/imagesOnServer")]
-        [HttpDelete]
-        public IHttpActionResult deleteImageOnserver([FromBody] ProductImageDto image)
+        [Route("api/insert_Image/{productId}")]
+        [HttpPut]
+        public IHttpActionResult InsertImage(int productId)
         {
-
-            if (ModelState.IsValid)
+            string ruta = @"C:\Users\Lara\source\repos\Colo\ClientMundoPanal\src\assets\";
+            try
             {
-                string ruta = @"C:\Users\Lara\source\repos\Colo\ClientMundoPanal\src\assets";
-                if (!File.Exists(ruta + "\\" + image.Name))
+                var httpRequest = HttpContext.Current.Request;
+                if (httpRequest.Files.Count > 0)
                 {
-                    System.IO.File.Delete(image.Name);
+                    var docfiles = new List<string>();
+                    for (var i = 0; i < httpRequest.Files.Count; i++)
+                    {
+                        var postedFile = httpRequest.Files[i];
+                        var filePath = System.IO.Path.Combine(ruta, postedFile.FileName);
+                        postedFile.SaveAs(filePath);
+                        docfiles.Add(filePath);
+
+                        imagenLogic.Save(postedFile.FileName, productId);
+
+                    }
                     return Ok();
                 }
                 else
@@ -152,58 +120,13 @@ namespace WebApi_Mun.Controllers
                     return BadRequest();
                 }
             }
-
-            return InternalServerError();
-        }
-
-        [Route("api/insert_Image/{productId}")]
-        [HttpPut]
-        public IHttpActionResult InsertImage(int productId)
-        {
-            string ruta = @"C:\Users\Lara\source\repos\Colo\ClientMundoPanal\src\assets\";
-
-            //var httpRequest = HttpContext.Current.Request;
-            //var docfiles = new List<string>();
-            //var postedFile = httpRequest.Files[0];
-            //var filePath = System.IO.Path.Combine(ruta, postedFile.FileName);
-            //postedFile.SaveAs(filePath);
-            //docfiles.Add(filePath);
-            //return Ok();
-
-            var httpRequest = HttpContext.Current.Request;
-
-            if (httpRequest.Files.Count > 0)
+            catch (Exception e)
             {
-                var docfiles = new List<string>();
-                foreach (string file in httpRequest.Files)
-                {
-                    var postedFile = httpRequest.Files[0];
-                    var filePath = System.IO.Path.Combine(ruta, postedFile.FileName);
-                    postedFile.SaveAs(filePath);
-                    docfiles.Add(filePath);
-                    return Ok();
-                }
-                return Ok();
+                return InternalServerError(e);
             }
-            else
-            {
-                return BadRequest();
-            }
-            return InternalServerError();
-
+          
         }
 
     }
 }
 
-
-//Maciel Rui13:15
-//var files = HttpContext.Request.Form.Files;
-//Maciel Rui13:17
-//var pathArchivoOriginal = Path.Combine(_configurationManager.PathFotosCredencialesArchivoOriginal, nombreArchivoOriginal);
-//File.WriteAllBytes(pathArchivoOriginal, bytes);
-//Maciel Rui13:19
-//var formFile = files[0];
-//using var target = new MemoryStream();
-//formFile.CopyTo(target);
-//target.ToArray()

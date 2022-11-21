@@ -12,7 +12,6 @@ namespace WebApi_Mun.Data
     {
         static string connectionString = ConfigurationManager.ConnectionStrings["MundoConnection"].ConnectionString;
 
-
         /// <summary>
         /// Devuelve todos las imagenes segun el producto
         /// </summary>
@@ -45,39 +44,28 @@ namespace WebApi_Mun.Data
 
         }
 
-
-
         /// <summary>
         /// Graba la imagen
         /// </summary>
         /// <param name="data">Datos de la imagen</param>
         /// <returns><c>true</c> Si se guardaron los datos</returns>
-        public int Save( ProductImageDto data)
+        public int Save(string data, int productId)
         {
             using (var connection = new SqlConnection(connectionString))
             {
 
                 SqlCommand objCmd;
                 var store = "";
-                if (data.ImageId != 0)
-                {
-                    store = "Image_Update";
+                store = "Image_Add";
 
-                }
-                else if (data.ProductId != 0 && data.Name.Length>0)
-                {
-                    store = "Image_Add";
-
-                }
                 using (objCmd = new SqlCommand(store, connection))
                 {
-                    if (store.Equals("Image_Update"))
-                        objCmd.Parameters.Add("@ImageId", SqlDbType.Int).Value = data.ImageId;
+
                     if (store.Equals("Image_Add"))
-                        objCmd.Parameters.Add("@ProductId", SqlDbType.Int).Value = data.ProductId;
+                        objCmd.Parameters.Add("@ProductId", SqlDbType.Int).Value = productId;
 
                     objCmd.CommandType = CommandType.StoredProcedure;
-                    objCmd.Parameters.Add("@Name", SqlDbType.Char, 5).Value = data.Name;
+                    objCmd.Parameters.Add("@Name", SqlDbType.VarChar).Value = data;
 
                     connection.Open();
                     var result = objCmd.ExecuteNonQuery();
@@ -89,11 +77,10 @@ namespace WebApi_Mun.Data
            
         }
 
-
         /// <summary>
-        /// Cambia el estado de la entidad
+        /// Borra la imagen
         /// </summary>
-        /// <param name="data">Datos de la entidad</param>
+        /// <param name="data">.</param>
         /// <returns><c>true</c> Si se guardaron los datos</returns>
         public int Delete(ProductImageDto data)
         {
@@ -101,45 +88,18 @@ namespace WebApi_Mun.Data
             {
 
                 SqlCommand objCmd;
-                var store = "";
-                if (data.ImageId != 0 && data.ProductId!=0)
-                {
-                    store = "Image_Delete";
-
-                }
+                var store = "Image_Delete";
 
                 using (objCmd = new SqlCommand(store, connection))
                 {
                     
                     objCmd.Parameters.Add("@ImageId", SqlDbType.Int).Value = data.ImageId;
-                    objCmd.Parameters.Add("@ProductId", SqlDbType.Int).Value = data.ProductId;
-
+                    objCmd.Parameters.Add("@ProductImageId", SqlDbType.Int).Value = data.ProductImageId;
                     objCmd.CommandType = CommandType.StoredProcedure;
-
                     connection.Open();
                     var result = objCmd.ExecuteNonQuery();
-
-                    if (result > 0)
-                    {
-                        try{
-                            string ruta = @"C:\Users\Lara\source\repos\Colo\ClientMundoPanal\src\assets";
-                            if (!File.Exists(ruta + "\\" + data.Name))
-                            {
-                                System.IO.File.Delete(data.Name);
-                                return 1;
-                            }
-                            else
-                            {
-                                return -1;
-                            }
-                        }
-                        catch(Exception e){
-                            throw e;
-                        }
-                        
-                    }
-
-                    return -2;
+   
+                    return result;
                 }
 
             }
