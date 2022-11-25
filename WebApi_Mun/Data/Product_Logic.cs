@@ -44,11 +44,20 @@ namespace WebApi_Mun.Data
             /// Filtro para el campo "Estado"
             /// </summary>
             public bool? State { get; set; }
+            /// <summary>
+            /// Filtro para el campo "Stock"
+            /// </summary>
+            public bool? Stock { get; set; }
 
             /// <summary>
             /// Filtro para el campo "Destacados"
             /// </summary>
             public bool? Featured { get; set; }
+
+            /// <summary>
+            /// Filtro para el campo "Descuentos"
+            /// </summary>
+            public bool? Discount { get; set; }
 
             /// <summary>
             /// Búsqueda por texto libre
@@ -70,7 +79,7 @@ namespace WebApi_Mun.Data
         private const string SELECT_ALL =
         ";SELECT A.ProductId, A.[Name] as ProductName,  A.[Description] " +
             " ,A.CategoryId_FK as CategoryId, o.[Name] as CategoryName, A.MarcaId_FK as MarcaId, mar.[Name] as MarcaName " +
-            " ,A.Price, A.DiscountId_FK as DiscountId, dis.[Amount] DiscountAmount, A.State, A.Featured " +
+            " ,A.Price, A.DiscountId_FK as DiscountId, dis.[Amount] DiscountAmount, A.Stock, A.Featured " +
             " ,img.[Name] as ImageName" +
             " ,A.CreatedBy_FK as UserId" +
             " FROM Products AS A " +
@@ -119,6 +128,8 @@ namespace WebApi_Mun.Data
                 SqlCommand objSqlCmd = new SqlCommand("", connection);
 
                 string strFilter = string.Empty;
+                strFilter = " WHERE [A].State=1 ";
+
                 if (filter != null)
                 {
                     if (filter.CategoryId.HasValue)
@@ -133,15 +144,19 @@ namespace WebApi_Mun.Data
                         objSqlCmd.Parameters.Add("@Id_Marca", SqlDbType.Int).Value = filter.MarcaId.Value;
 
                     }
-                    if (filter.State.HasValue)
+                    if (filter.Stock.HasValue)
                     {
-                        strFilter += " AND [A].State = @State";
-                        objSqlCmd.Parameters.Add("@State", SqlDbType.Decimal).Value = filter.State.Value;
+                        strFilter += " AND [A].Stock = @Stock";
+                        objSqlCmd.Parameters.Add("@Stock", SqlDbType.TinyInt).Value = filter.Stock.Value;
                     }
                     if (filter.Featured.HasValue)
                     {
                         strFilter += " AND [A].Featured = @Featured";
-                        objSqlCmd.Parameters.Add("@Featured", SqlDbType.Bit).Value = filter.Featured.Value;
+                        objSqlCmd.Parameters.Add("@Featured", SqlDbType.TinyInt).Value = filter.Featured.Value;
+                    }
+                    if (filter.Discount.HasValue)
+                    {
+                        strFilter += " AND [A].DiscountId_FK is not null";
                     }
                     //if (!string.IsNullOrWhiteSpace(filter.FreeText))
                     //{
@@ -149,8 +164,6 @@ namespace WebApi_Mun.Data
                     //    objSqlCmd.Parameters.Add("@FreeText", SqlDbType.NVarChar, 1000).Value = filter.FreeText;
                     //}
 
-                    if (!string.IsNullOrWhiteSpace(strFilter))
-                        strFilter = " WHERE " + strFilter.Substring(5);
                 }
 
                 string strWithParams = string.Format(SELECT_ALL, strOrderField, !orderAscendant.HasValue || orderAscendant.Value ? "ASC" : "DESC", strFilter);
@@ -193,27 +206,28 @@ namespace WebApi_Mun.Data
                 }
                 //lista para devolver los datos mapeados ProductModelList
                 List<ProductModelDto> productList = new List<ProductModelDto>();            
-                foreach (DataRow row in tab)
-                {                  
-                    ProductModelDto product = new ProductModelDto();
-                    product.ProductId = Convert.ToInt32(row["ProductId"]);
-                    product.Name = Convert.ToString(row["ProductName"]);
-                    product.Description = Convert.ToString(row["Description"]);
-                    product.CategoryName = Convert.ToString(row["CategoryName"]);
-                    product.MarcaName = Convert.ToString(row["MarcaName"]);
-                    if(!row.IsNull("DiscountAmount"))
-                        product.DiscountAmount = Convert.ToInt32(row["DiscountAmount"]);
-                    product.State = Convert.ToBoolean(row["State"]);
-                    product.Featured = Convert.ToBoolean(row["Featured"]);
-                    product.Price = Convert.ToDouble(row["Price"]);
-                    product.ImageName= Convert.ToString(row["ImageName"]);
-                    productList.Add(product);                 
-                }
+                //foreach (DataRow row in tab)
+                //{                  
+                //    ProductModelDto product = new ProductModelDto();
+                //    product.ProductId = Convert.ToInt32(row["ProductId"]);
+                //    product.Name = Convert.ToString(row["ProductName"]);
+                //    product.Description = Convert.ToString(row["Description"]);
+                //    product.CategoryName = Convert.ToString(row["CategoryName"]);
+                //    product.MarcaName = Convert.ToString(row["MarcaName"]);
+                //    if(!row.IsNull("DiscountAmount"))
+                //        product.DiscountAmount = Convert.ToInt32(row["DiscountAmount"]);
+                //    if (!row.IsNull("Stock"))
+                //        product.Stock = Convert.ToBoolean(row["Stock"]);
+                //    product.Featured = Convert.ToBoolean(row["Featured"]);
+                //    product.Price = Convert.ToDouble(row["Price"]);
+                //    product.ImageName= Convert.ToString(row["ImageName"]);
+                //    productList.Add(product);                 
+                //}
                 connection.Close();
                 return (new DataTableModel()
                 {
                     RecordsCount = recordCount,
-                    Data = productList
+                    Data = tab
                 });
             }
         }
@@ -252,6 +266,7 @@ namespace WebApi_Mun.Data
                             items.DiscountId = objDR.GetInt32(5);
                         items.Price = (double)objDR.GetDecimal(6);
                         items.State = objDR.GetByte(7) == 0 ? false : true;
+                        items.Stock =(bool) objDR.GetSqlBoolean(8);
                         items.Featured = objDR.GetByte(8) == 0 ? false : true;
 
                         return items;
@@ -259,7 +274,7 @@ namespace WebApi_Mun.Data
                 }
                 catch (Exception e)
                 {
-                    throw e;
+                    throw ;
                 }
 
             }
@@ -284,6 +299,7 @@ namespace WebApi_Mun.Data
 
                     while (objDR.Read())
                     {
+                        
                         var c = new ProductModelDto();
                         c.ProductId = objDR.GetInt32(0);
                         c.Name = objDR.GetString(1);
@@ -334,6 +350,8 @@ namespace WebApi_Mun.Data
                 objCmd.Parameters.Add("@Description", SqlDbType.VarChar, 250).Value = data.Description;
                 objCmd.Parameters.Add("@Featured", SqlDbType.TinyInt).Value = (data.Featured == true ? 1 : 0);
                 objCmd.Parameters.Add("@State", SqlDbType.TinyInt).Value = (data.State == true ? 1 : 0);
+                objCmd.Parameters.Add("@Stock", SqlDbType.TinyInt).Value = (data.State == true ? 1 : 0);
+
                 objCmd.Parameters.Add("@Price", SqlDbType.Money).Value = data.Price;
 
 

@@ -131,11 +131,11 @@ namespace WebApi_Mun.Data
                         objCmd.Parameters.Add("@CategoryId", SqlDbType.Int).Value = data.CategoryId;
 
                     objCmd.CommandType = CommandType.StoredProcedure;
-                    objCmd.Parameters.Add("@Name", SqlDbType.Char, 5).Value = data.Name;
+                    objCmd.Parameters.Add("@Name", SqlDbType.VarChar,150).Value = data.Name;
 
                     connection.Open();
                     var result = objCmd.ExecuteNonQuery();
-
+                    connection.Close();
                     return result;
                 }
 
@@ -151,32 +151,25 @@ namespace WebApi_Mun.Data
         /// <returns><c>true</c> Si se guardaron los datos</returns>
         public int Desactive(int categoryId)
         {
-
             using (var connection = new SqlConnection(connectionString))
             {
-
                 SqlCommand objCmd;
                 var store = "";
-
                 store = "Category_Desactive";
                 objCmd = new SqlCommand(store, connection);
 
-                using (objCmd = new SqlCommand(store, connection))
+                using (objCmd)
                 {
-                    objCmd.Parameters.Add("@CategoryId", SqlDbType.Int).Value = categoryId;
-               
-                    connection.Open();
-                    var result = objCmd.ExecuteNonQuery();
+                   objCmd.CommandType = CommandType.StoredProcedure;
+                   objCmd.Parameters.Add("@CategoryId", SqlDbType.Int).Value = categoryId;
 
-                    return result;
+                   connection.Open();
+                   var result = objCmd.ExecuteNonQuery();
+                   connection.Close();
+                   return result;
                 }
-
             }
-
-
         }
-
-
 
     }
 }

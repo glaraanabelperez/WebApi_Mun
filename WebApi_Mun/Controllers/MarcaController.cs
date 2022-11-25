@@ -107,7 +107,6 @@ namespace WebApi_Mun.Controllers
         /// </summary>
         /// <param name="data">Datos de la marca</param>
         /// <returns><c>true</c> Si se guardaron los datos</returns>
-        [Route("api/marca/{marcaId}")]
         [HttpPost]
         public IHttpActionResult Post([FromBody] MarcaModel data)
         {
@@ -140,7 +139,7 @@ namespace WebApi_Mun.Controllers
         /// </summary>
         /// <param name="data">Datos del estado</param>
         /// <returns><c>1</c> Si se guardaron los datos</returns>
-        [Route("api/discount/state/{itemId}")]
+        [Route("api/marca/state/{itemId}")]
         [HttpDelete]
         public IHttpActionResult ChangeState(int itemId)
         {

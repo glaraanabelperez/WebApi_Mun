@@ -51,6 +51,11 @@ namespace WebApi_Mun.Models
         public bool? State { get; set; }
 
         /// <summary>
+        /// Stock
+        /// </summary>
+        public bool? Stock { get; set; }
+
+        /// <summary>
         /// Destacado
         /// </summary>
         public bool? Featured { get; set; }
@@ -102,6 +107,11 @@ namespace WebApi_Mun.Models
         /// Estado
         /// </summary>
         public bool? State { get; set; }
+
+        /// <summary>
+        /// Stock
+        /// </summary>
+        public bool? Stock { get; set; }
 
         /// <summary>
         /// Destacado
