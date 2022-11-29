@@ -139,7 +139,7 @@ namespace WebApi_Mun.Data
                         objCmd.Parameters.Add("@DiscountId", SqlDbType.Int).Value = data.DiscountId;
                     objCmd.CommandType = CommandType.StoredProcedure;
                     objCmd.Parameters.Add("@Amount", SqlDbType.TinyInt).Value = data.Amount;                 
-                    objCmd.Parameters.Add("@CreatedBy", SqlDbType.Int).Value = data.CreatedBy;
+                    objCmd.Parameters.Add("@CreatedBy", SqlDbType.Int).Value = 1;
 
                     connection.Open();
                     Int32 result = objCmd.ExecuteNonQuery();

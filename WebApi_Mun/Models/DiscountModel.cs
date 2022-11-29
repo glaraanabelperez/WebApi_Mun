@@ -14,7 +14,6 @@ namespace WebApi_Mun.Models
         /// </summary>
         public int? DiscountId { get; set; }
 
-
         /// <summary>
         /// Nombre
         /// </summary>
@@ -24,6 +23,7 @@ namespace WebApi_Mun.Models
         /// Nombre
         /// </summary>
         public bool? State { get; set; }
+
         /// <summary>
         /// Identificador usuario creador
         /// </summary>

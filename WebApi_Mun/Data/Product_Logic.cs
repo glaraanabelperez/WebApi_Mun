@@ -79,17 +79,17 @@ namespace WebApi_Mun.Data
         private const string SELECT_ALL =
         ";SELECT A.ProductId, A.[Name] as ProductName,  A.[Description] " +
             " ,A.CategoryId_FK as CategoryId, o.[Name] as CategoryName, A.MarcaId_FK as MarcaId, mar.[Name] as MarcaName " +
-            " ,A.Price, A.DiscountId_FK as DiscountId, dis.[Amount] DiscountAmount, A.Stock, A.Featured " +
-            " ,img.[Name] as ImageName" +
-            " ,A.CreatedBy_FK as UserId" +
+            " ,A.Price, A.DiscountId_FK as DiscountId, dis.[Amount] DiscountAmount, A.Stock, A.Featured ," +
+            " (select top 1 Images.Name " +
+            " from ProductImage" +
+            " inner join Images on Images.ImageId=ProductImage.ImageId_FK " +
+            " where ProductId_FK = A.ProductId" +
+            " ) as ImageName " +
+            " , A.CreatedBy_FK as UserId" +
             " FROM Products AS A " +
             " INNER JOIN dbo.Categories O ON O.CategoryId = A.CategoryId_FK " +
             " INNER JOIN [dbo].[Marcas] mar on A.MarcaId_FK= mar.MarcaId" +
             " left JOIN [dbo].[Discounts] dis on A.DiscountId_FK= dis.DiscountId" +
-            " left JOIN [dbo].[ProductImage] imp on A.ProductId= (" +
-            "select top 1 ProductId_FK from [dbo].[ProductImage]" +
-            ")" +
-            " left JOIN [dbo].[Images] img on img.ImageId= imp.ImageId_FK" +
             " {2} " +
             " ORDER BY {0} {1} ";
 
@@ -144,17 +144,17 @@ namespace WebApi_Mun.Data
                         objSqlCmd.Parameters.Add("@Id_Marca", SqlDbType.Int).Value = filter.MarcaId.Value;
 
                     }
-                    if (filter.Stock.HasValue)
+                    if (filter.Stock.HasValue && filter.Stock==true)
                     {
                         strFilter += " AND [A].Stock = @Stock";
                         objSqlCmd.Parameters.Add("@Stock", SqlDbType.TinyInt).Value = filter.Stock.Value;
                     }
-                    if (filter.Featured.HasValue)
+                    if (filter.Featured.HasValue && filter.Featured==true)
                     {
                         strFilter += " AND [A].Featured = @Featured";
                         objSqlCmd.Parameters.Add("@Featured", SqlDbType.TinyInt).Value = filter.Featured.Value;
                     }
-                    if (filter.Discount.HasValue)
+                    if (filter.Discount.HasValue && filter.Discount == true)
                     {
                         strFilter += " AND [A].DiscountId_FK is not null";
                     }
@@ -174,19 +174,12 @@ namespace WebApi_Mun.Data
                 if (from.HasValue)
                 {
                     strWithParams += string.Format(OFFSET, from, length);
+                }
 
-                    objSqlCmd.CommandText = SELECTCOUNT + strFilter + strWithParams;
+                objSqlCmd.CommandText = SELECTCOUNT + strFilter + strWithParams;
 #if DEBUG
-                    System.Diagnostics.Trace.WriteLine(objSqlCmd.CommandText);
+                System.Diagnostics.Trace.WriteLine(objSqlCmd.CommandText);
 #endif
-                }
-                else
-                {
-                    objSqlCmd.CommandText = strWithParams;
-#if DEBUG
-                    System.Diagnostics.Trace.WriteLine(strWithParams);
-#endif
-                }
 
                 SqlDataAdapter adapter = new SqlDataAdapter();
                 adapter.SelectCommand = objSqlCmd;
@@ -194,40 +187,33 @@ namespace WebApi_Mun.Data
                 DataSet dataset = new DataSet();
                 adapter.Fill(dataset);
 
-                var tab= dataset.Tables[0].Rows;
-                if (from.HasValue)
-                {
-                    tab = dataset.Tables[1].Rows;
-                    recordCount = (int)dataset.Tables[0].Rows[0][0];
-                }
-                else
-                {
-                    recordCount = -1;
-                }
+                var tab = dataset.Tables[1].Rows;
+                recordCount = (int)dataset.Tables[0].Rows[0][0];
+             
                 //lista para devolver los datos mapeados ProductModelList
-                List<ProductModelDto> productList = new List<ProductModelDto>();            
-                //foreach (DataRow row in tab)
-                //{                  
-                //    ProductModelDto product = new ProductModelDto();
-                //    product.ProductId = Convert.ToInt32(row["ProductId"]);
-                //    product.Name = Convert.ToString(row["ProductName"]);
-                //    product.Description = Convert.ToString(row["Description"]);
-                //    product.CategoryName = Convert.ToString(row["CategoryName"]);
-                //    product.MarcaName = Convert.ToString(row["MarcaName"]);
-                //    if(!row.IsNull("DiscountAmount"))
-                //        product.DiscountAmount = Convert.ToInt32(row["DiscountAmount"]);
-                //    if (!row.IsNull("Stock"))
-                //        product.Stock = Convert.ToBoolean(row["Stock"]);
-                //    product.Featured = Convert.ToBoolean(row["Featured"]);
-                //    product.Price = Convert.ToDouble(row["Price"]);
-                //    product.ImageName= Convert.ToString(row["ImageName"]);
-                //    productList.Add(product);                 
-                //}
+                List<ProductModelDto> productList = new List<ProductModelDto>();
+                foreach (DataRow row in tab)
+                {
+                    ProductModelDto product = new ProductModelDto();
+                    product.ProductId = Convert.ToInt32(row["ProductId"]);
+                    product.Name = Convert.ToString(row["ProductName"]);
+                    product.Description = Convert.ToString(row["Description"]);
+                    product.CategoryName = Convert.ToString(row["CategoryName"]);
+                    product.MarcaName = Convert.ToString(row["MarcaName"]);
+                    if (!row.IsNull("DiscountAmount"))
+                        product.DiscountAmount = Convert.ToInt32(row["DiscountAmount"]);
+                    if (!row.IsNull("Stock"))
+                        product.Stock = Convert.ToBoolean(row["Stock"]);
+                    product.Featured = Convert.ToBoolean(row["Featured"]);
+                    product.Price = Convert.ToDouble(row["Price"]);
+                    product.ImageName = Convert.ToString(row["ImageName"]);
+                    productList.Add(product);
+                }
                 connection.Close();
                 return (new DataTableModel()
                 {
                     RecordsCount = recordCount,
-                    Data = tab
+                    Data = productList
                 });
             }
         }
@@ -266,8 +252,8 @@ namespace WebApi_Mun.Data
                             items.DiscountId = objDR.GetInt32(5);
                         items.Price = (double)objDR.GetDecimal(6);
                         items.State = objDR.GetByte(7) == 0 ? false : true;
-                        items.Stock =(bool) objDR.GetSqlBoolean(8);
-                        items.Featured = objDR.GetByte(8) == 0 ? false : true;
+                        items.Stock = objDR.GetByte(8) == 0 ? false : true;
+                        items.Featured = objDR.GetByte(9) == 0 ? false : true;
 
                         return items;
                     }
@@ -349,9 +335,8 @@ namespace WebApi_Mun.Data
                 objCmd.Parameters.Add("@Name", SqlDbType.VarChar, 250).Value = data.Name;
                 objCmd.Parameters.Add("@Description", SqlDbType.VarChar, 250).Value = data.Description;
                 objCmd.Parameters.Add("@Featured", SqlDbType.TinyInt).Value = (data.Featured == true ? 1 : 0);
-                objCmd.Parameters.Add("@State", SqlDbType.TinyInt).Value = (data.State == true ? 1 : 0);
-                objCmd.Parameters.Add("@Stock", SqlDbType.TinyInt).Value = (data.State == true ? 1 : 0);
-
+                objCmd.Parameters.Add("@State", SqlDbType.TinyInt).Value = 1;
+                objCmd.Parameters.Add("@Stock", SqlDbType.TinyInt).Value = (data.Stock == true ? 1 : 0);
                 objCmd.Parameters.Add("@Price", SqlDbType.Money).Value = data.Price;
 
 

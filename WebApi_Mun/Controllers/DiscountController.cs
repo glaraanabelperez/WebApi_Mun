@@ -108,7 +108,6 @@ namespace WebApi_Mun.Controllers
         /// </summary>
         /// <param name="data">Datos del decsuento</param>
         /// <returns><c>true</c> Si se guardaron los datos</returns>
-        [Route("api/discount/{discountId}")]
         [HttpPost]
         public IHttpActionResult Post([FromBody] DiscountModel data)
         {

@@ -43,31 +43,33 @@ namespace WebApi_Mun.Controllers
         /// <returns><c>1</c> Si se guardaron los datos</returns>
         [Route("api/images/delete")]
         [HttpPost]
-        public IHttpActionResult DeleteImage([FromBody] ProductImageDto data)
+        public IHttpActionResult DeleteImage([FromBody] ProductImageDto [] data)
         {
-            if (ModelState.IsValid && data.ProductImageId.HasValue)
+            try
             {
-                try
+                foreach (ProductImageDto image in data)
                 {
-                    string ruta = @"C:\Users\Lara\source\repos\Colo\ClientMundoPanal\src\assets";
-                    int result = imagenLogic.Delete(data);
-                    if (File.Exists(ruta + "\\" + data.Name) && result > 0)
+                    if (ModelState.IsValid && image.ProductImageId.HasValue)
                     {
-                        System.IO.File.Delete(data.Name);
-                        return Ok();                   
+
+                        string ruta = @"C:\Users\Lara\source\repos\Colo\ClientMundoPanal\src\assets";
+                        int result = imagenLogic.Delete(image);
+                        if (File.Exists(ruta + "\\" + image.Name) && result > 0)
+                        {
+                            System.IO.File.Delete(System.IO.Path.Combine(ruta, image.Name));
+                        }
                     }
                     else
                     {
-                        return BadRequest("El elemento a editar no existe");
+                        return BadRequest("El modelo de datos esta incorrecto o vacio");
                     }
                 }
-                catch (Exception ex)
-                {
-                    return Content(HttpStatusCode.InternalServerError, ex.Message);
-                }
             }
-           
-            return BadRequest("El modelo de datos esta incorrecto o vacio");
+            catch (Exception ex)
+            {
+                return Content(HttpStatusCode.InternalServerError, ex.Message);
+            }
+            return Ok();
         }
 
         [Route("api/images")]
