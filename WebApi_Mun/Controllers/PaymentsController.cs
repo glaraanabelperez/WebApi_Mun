@@ -76,7 +76,7 @@ namespace WebApi_Mun.Controllers
                 
              };
 
-            // Crea la preferencia usando el client
+            // Crea la preferencia usando el client insertar cambios
             var client = new PreferenceClient();
             Preference preference = await client.CreateAsync(request);
             return preference;
