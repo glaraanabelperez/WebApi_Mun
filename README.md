@@ -5,7 +5,8 @@ webApi .net framwork 4.7 con ado.net
 
 Install Package :
 Microsoft.AspNet.WebApi.Cors
-
+-Integracion Mercado Pago:
+mercadopago-sdk
 
 ![image](https://user-images.githubusercontent.com/55300998/202855559-eaa677c0-8582-4cd1-98e7-82e0e3b32e86.png)
 
