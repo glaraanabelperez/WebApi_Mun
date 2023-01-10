@@ -142,7 +142,7 @@ namespace WebApi_Mun.Data
                     objCmd.Parameters.Add("@CreatedBy", SqlDbType.Int).Value = 1;
 
                     connection.Open();
-                    Int32 result = objCmd.ExecuteNonQuery();
+                    var result = objCmd.ExecuteNonQuery();
 
                     return result;
                 }

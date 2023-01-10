@@ -15,6 +15,8 @@ namespace WebApi_Mun.Controllers
     public class ImageController : ApiController
     {
         public ImageLogic imagenLogic = new ImageLogic();
+        string ruta = @"C:\Users\LARA\source\repos\Client_Mundo\src\assets";
+
 
         /// <summary>
         /// Listado de todas las categorias segun usuario
@@ -52,11 +54,10 @@ namespace WebApi_Mun.Controllers
                     if (ModelState.IsValid && image.ProductImageId.HasValue)
                     {
 
-                        string ruta = @"C:\Users\Lara\source\repos\Colo\ClientMundoPanal\src\assets";
                         int result = imagenLogic.Delete(image);
-                        if (File.Exists(ruta + "\\" + image.Name) && result > 0)
+                        if (File.Exists(this.ruta + "\\" + image.Name) && result > 0)
                         {
-                            System.IO.File.Delete(System.IO.Path.Combine(ruta, image.Name));
+                            System.IO.File.Delete(System.IO.Path.Combine(this.ruta, image.Name));
                         }
                     }
                     else
@@ -79,8 +80,7 @@ namespace WebApi_Mun.Controllers
             
             if (ModelState.IsValid)
             {
-                string ruta = @"C:\Users\Lara\source\repos\Colo\ClientMundoPanal\src\assets";
-                if (!File.Exists(ruta + "\\" + image.Name))
+                if (!File.Exists(this.ruta + "\\" + image.Name))
                 {
                     return Ok();
                 }
@@ -98,7 +98,6 @@ namespace WebApi_Mun.Controllers
         [HttpPut]
         public IHttpActionResult InsertImage(int productId)
         {
-            string ruta = @"C:\Users\Lara\source\repos\Colo\ClientMundoPanal\src\assets\";
             try
             {
                 var httpRequest = HttpContext.Current.Request;
@@ -108,7 +107,7 @@ namespace WebApi_Mun.Controllers
                     for (var i = 0; i < httpRequest.Files.Count; i++)
                     {
                         var postedFile = httpRequest.Files[i];
-                        var filePath = System.IO.Path.Combine(ruta, postedFile.FileName);
+                        var filePath = System.IO.Path.Combine(this.ruta, postedFile.FileName);
                         postedFile.SaveAs(filePath);
                         docfiles.Add(filePath);
 

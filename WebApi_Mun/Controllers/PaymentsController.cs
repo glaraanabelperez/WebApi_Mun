@@ -1,32 +1,36 @@
 ﻿using System.Web.Http;
 using System.Web.Http.Cors;
-using WebApi_Mun.Data;
-using MercadoPago;
 using MercadoPago.Config;
 using MercadoPago.Client.Preference;
 using MercadoPago.Resource.Preference;
 using System.Collections.Generic;
 using MercadoPago.Client.Payment;
 using MercadoPago.Client.Common;
-using System.Net;
-using System.IO;
-using System;
 using MercadoPago.Client.PaymentMethod;
 using MercadoPago.Resource.PaymentMethod;
 using MercadoPago.Resource;
 using System.Threading.Tasks;
 using MercadoPago.Resource.Common;
+using System.Net.Mail;
+using System.Net;
+using System.Security.Cryptography.X509Certificates;
+using System.Net.Security;
+using MercadoPago.Client;
+using MercadoPago.Resource.Payment;
 
 namespace WebApi_Mun.Controllers
 {
     [EnableCors(origins: "http://localhost:4200", headers: "*", methods: "*")]
     public class PaymentsController : ApiController 
     {
+        string token= "APP_USR-986919186102180-121614-36e62d04f5685e93d6f84d98dab69587-1265763490";
 
         [Route("api/payments/post/")]
         [HttpPost]
         public async Task<Preference> PostAsync([FromBody] List<ItemBuy> item)
         {
+            //APP_USR-986919186102180-121614-36e62d04f5685e93d6f84d98dab69587-1265763490
+            //TEST - 986919186102180 - 121614 - 6b51be8f45d87142d9fcb56564d0d925 - 1265763490
             MercadoPagoConfig.AccessToken = "TEST-986919186102180-121614-6b51be8f45d87142d9fcb56564d0d925-1265763490";
 
             var Items = new List<PreferenceItemRequest>();
@@ -34,13 +38,14 @@ namespace WebApi_Mun.Controllers
             {
                 Items.Add(new PreferenceItemRequest
                 {
+                    Id = it.Id.ToString(),
                     Title = it.Title,
                     Quantity = it.Quantity,
                     CurrencyId = "ARS",
-                    UnitPrice = (it.Price * it.Quantity)
-                });
+                    UnitPrice = (it.Price)
+                }) ;
             }
-
+            //PaymentCreateRequest
             var request = new PreferenceRequest
             {
                 Items = Items,
@@ -52,7 +57,7 @@ namespace WebApi_Mun.Controllers
                 },
                 Payer= new PreferencePayerRequest
                 {
-                    Name="Testa",
+                    Name="Testa222",
                     Surname="Teste Tes",
                     Email="gnanajsu@hdhd.com",
                     Identification = new IdentificationRequest
@@ -89,12 +94,25 @@ namespace WebApi_Mun.Controllers
         [HttpGet]
         public async Task<string> PostPaymentsMethodsAsync()
         {
+            MercadoPagoConfig.AccessToken = token;
+
+
+
+            var client = new PaymentMethodClient();
+                ResourcesList<PaymentMethod> paymentMethods = await client.ListAsync();
+            return null;
+
+
+        }
+
+        [Route("api/payment/{id}")]
+        [HttpGet]
+        public Task<string> GetPayment(long id)
+        {
             MercadoPagoConfig.AccessToken = "TEST-986919186102180-121614-6b51be8f45d87142d9fcb56564d0d925-1265763490";
 
-
-
-                var client = new PaymentMethodClient();
-                ResourcesList<PaymentMethod> paymentMethods = await client.ListAsync();
+            Payment payment = new PaymentClient().Capture(id);
+            var order=payment.AdditionalInfo.Items;
             return null;
 
 

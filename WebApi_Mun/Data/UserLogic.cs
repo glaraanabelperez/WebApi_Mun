@@ -20,7 +20,7 @@ namespace WebApi_Mun.Data
             {
                 using (var command = new SqlCommand("Login", connection))
                 {
-                    command.Parameters.Add("@UserName", SqlDbType.NVarChar).Value = data.UserName;
+                    command.Parameters.Add("@UserName", SqlDbType.VarChar).Value = data.UserName;
                     command.Parameters.Add("@Password", SqlDbType.VarChar).Value = data.Password;
 
                     command.CommandType = CommandType.StoredProcedure;

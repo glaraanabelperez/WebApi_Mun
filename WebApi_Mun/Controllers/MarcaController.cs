@@ -46,7 +46,7 @@ namespace WebApi_Mun.Controllers
             try
             {
                 var list = mar.ListActive();
-                if (list == null)
+                if (list == null || list.Length==0 )
                 {
                     return NotFound();
                 }

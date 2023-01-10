@@ -89,9 +89,10 @@ namespace WebApi_Mun.Controllers
 
             if (ModelState.IsValid)
             {
+                var result = 0;
                 try
                 {
-                    var result = dis.Save(data);
+                    result = dis.Save(data);
                     return Ok();
                 }
                 catch (Exception ex)
