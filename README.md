@@ -4,7 +4,8 @@
 webApi .net framwork 4.7 con ado.net
 
 Install Package :
-Microsoft.AspNet.WebApi.Cors
+Aqua.Core (Transform any object-graph into a dynamic, composed dictionaries like structure, holding serializable values and type information.)
+Microsoft.AspNet.Cors
 
 -Integracion Mercado Pago:
 mercadopago-sdk
