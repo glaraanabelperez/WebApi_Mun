@@ -13,6 +13,7 @@ namespace WebApi_Mun.Controllers
     public class ProductController : ApiController
     {
         ProductLogic prodLogic = new ProductLogic();
+        ImageLogic imagenLogic = new ImageLogic();
 
         /// <summary>
         /// Listado de todos los productos 
@@ -140,7 +141,10 @@ namespace WebApi_Mun.Controllers
                 int result = prodLogic.Desactive(itemId);
 
                 if (result > 0)
+                {
+                    this.imagenLogic.DeleteFolder(itemId);
                     return Ok();
+                }
                 else
                     return BadRequest("El elemento no puede eliminarse");
             }

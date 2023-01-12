@@ -23,15 +23,14 @@ namespace WebApi_Mun.Controllers
     [EnableCors(origins: "http://localhost:4200", headers: "*", methods: "*")]
     public class PaymentsController : ApiController 
     {
-        string token= "APP_USR-986919186102180-121614-36e62d04f5685e93d6f84d98dab69587-1265763490";
-
+        string token = "TEST-4769958945128544-010915-d6d1751ee186d4a06def0a7c0bfb47c7-1265763519";
+    
         [Route("api/payments/post/")]
         [HttpPost]
         public async Task<Preference> PostAsync([FromBody] List<ItemBuy> item)
         {
-            //APP_USR-986919186102180-121614-36e62d04f5685e93d6f84d98dab69587-1265763490
-            //TEST - 986919186102180 - 121614 - 6b51be8f45d87142d9fcb56564d0d925 - 1265763490
-            MercadoPagoConfig.AccessToken = "TEST-986919186102180-121614-6b51be8f45d87142d9fcb56564d0d925-1265763490";
+  
+            MercadoPagoConfig.AccessToken =token;
 
             var Items = new List<PreferenceItemRequest>();
             foreach (ItemBuy it in item)
@@ -54,32 +53,9 @@ namespace WebApi_Mun.Controllers
                     Success = "http://localhost:4200/home",
                     Failure = "http://localhost:4200/home",
                     Pending = "http://localhost:4200/home"
-                },
-                Payer= new PreferencePayerRequest
-                {
-                    Name="Testa222",
-                    Surname="Teste Tes",
-                    Email="gnanajsu@hdhd.com",
-                    Identification = new IdentificationRequest
-                    {
-                        Type = "dni",
-                        Number = "345676546"
-                    },
-                    Phone = new PhoneRequest
-                    {
-                        AreaCode = "011",
-                        Number = "546474645"
-                    },
-                    Address=new AddressRequest
-                    {
-                        StreetName="Pointsenot",
-                        StreetNumber="41526",
-                        ZipCode="14521"
-                    }
-
                 }
-                
-             };
+
+            };
 
             // Crea la preferencia usando el client insertar cambios
             var client = new PreferenceClient();
@@ -107,14 +83,16 @@ namespace WebApi_Mun.Controllers
 
         [Route("api/payment/{id}")]
         [HttpGet]
-        public Task<string> GetPayment(long id)
+        public async Task<long> GetPayment(long id)
         {
-            MercadoPagoConfig.AccessToken = "TEST-986919186102180-121614-6b51be8f45d87142d9fcb56564d0d925-1265763490";
+            MercadoPagoConfig.AccessToken = token;
+            //Payment payment = new PaymentClient().Capture(id);
 
-            Payment payment = new PaymentClient().Capture(id);
-            var order=payment.AdditionalInfo.Items;
-            return null;
-
+            var client = new PaymentClient();
+            Payment payment = await client.CaptureAsync(id);
+            //var order = payment.AdditionalInfo.Items;
+            //this.pay.Save(payment);
+            return (long)payment.Id;
 
         }
 

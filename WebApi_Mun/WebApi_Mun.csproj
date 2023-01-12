@@ -211,6 +211,7 @@
     <Compile Include="Controllers\ProductController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Controllers\ValuesController.cs" />
+    <Compile Include="Data\PaymentsLogic.cs" />
     <Compile Include="Data\Product_Logic.cs" />
     <Compile Include="Data\ImageLogic.cs" />
     <Compile Include="Data\DiscountLogic.cs" />
@@ -220,6 +221,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\PaymentsModel.cs" />
     <Compile Include="Models\StateModel.cs" />
     <Compile Include="Models\ProductImageDto.cs" />
     <Compile Include="Models\DiscountModel.cs" />

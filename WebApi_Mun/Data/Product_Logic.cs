@@ -285,18 +285,28 @@ namespace WebApi_Mun.Data
 
                     while (objDR.Read())
                     {
+                        var price = (Math.Truncate((double)objDR.GetDecimal(3) * 100) / 100);
                         
+
                         var c = new ProductModelDto();
                         c.ProductId = objDR.GetInt32(0);
                         c.Name = objDR.GetString(1);
                         c.Description = objDR.GetString(2);
-                        c.Price = (double)objDR.GetDecimal(3);
+                        c.Price = price ;
                         if (!objDR.IsDBNull(4))
+                        {
+                            var priceDiscount = ((double)objDR.GetDecimal(3) - ((double)objDR.GetDecimal(3) * (int)objDR.GetByte(4)) / 100);
+                            priceDiscount = (Math.Truncate(priceDiscount * 100) / 100);
                             c.DiscountAmount = (int)objDR.GetByte(4);
+                            c.PriceWithDiscount = priceDiscount;
+                        }
+                        else
+                        {
+                            c.PriceWithDiscount = price;
+                        }
                         c.MarcaName = objDR.GetString(5);
                         c.CategoryName = objDR.GetString(6); 
                         c.ImageName = objDR.GetString(7);
-
                         items.Add(c);
                     }
                     return items.ToArray();
@@ -385,6 +395,7 @@ namespace WebApi_Mun.Data
                 return result;
             }
         }
+
 
 
     }

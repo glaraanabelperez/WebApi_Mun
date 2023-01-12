@@ -19,7 +19,7 @@ namespace WebApi_Mun.Controllers
 
 
         /// <summary>
-        /// Listado de todas las categorias segun usuario
+        /// Listado de todas las imagenes segun producto
         /// </summary>
         [Route("api/images/{productId}")]
         [HttpGet]
@@ -51,13 +51,15 @@ namespace WebApi_Mun.Controllers
             {
                 foreach (ProductImageDto image in data)
                 {
+                    string pathString = System.IO.Path.Combine(this.ruta, image.ProductId.ToString());
+
                     if (ModelState.IsValid && image.ProductImageId.HasValue)
                     {
 
                         int result = imagenLogic.Delete(image);
-                        if (File.Exists(this.ruta + "\\" + image.Name) && result > 0)
+                        if (File.Exists(pathString + "\\" + image.Name) && result > 0)
                         {
-                            System.IO.File.Delete(System.IO.Path.Combine(this.ruta, image.Name));
+                            System.IO.File.Delete(System.IO.Path.Combine(pathString, image.Name));
                         }
                     }
                     else
@@ -77,10 +79,11 @@ namespace WebApi_Mun.Controllers
         [HttpPost]
         public IHttpActionResult verifyImageOnserver([FromBody] ProductImageDto image)
         {
-            
+            string pathString = System.IO.Path.Combine(this.ruta, image.ProductId.ToString());
+
             if (ModelState.IsValid)
             {
-                if (!File.Exists(this.ruta + "\\" + image.Name))
+                if (!File.Exists(pathString + "\\" + image.Name))
                 {
                     return Ok();
                 }
@@ -98,6 +101,14 @@ namespace WebApi_Mun.Controllers
         [HttpPut]
         public IHttpActionResult InsertImage(int productId)
         {
+            // To create a string that specifies the path to a subfolder under your
+            // top-level folder, add a name for the subfolder to folderName.
+            string pathString = System.IO.Path.Combine(this.ruta, productId.ToString());
+            if (!System.IO.File.Exists(pathString))
+            {
+                System.IO.Directory.CreateDirectory(pathString);
+            }
+
             try
             {
                 var httpRequest = HttpContext.Current.Request;
@@ -107,7 +118,7 @@ namespace WebApi_Mun.Controllers
                     for (var i = 0; i < httpRequest.Files.Count; i++)
                     {
                         var postedFile = httpRequest.Files[i];
-                        var filePath = System.IO.Path.Combine(this.ruta, postedFile.FileName);
+                        var filePath = System.IO.Path.Combine(pathString, postedFile.FileName);
                         postedFile.SaveAs(filePath);
                         docfiles.Add(filePath);
 

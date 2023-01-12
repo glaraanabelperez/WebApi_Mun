@@ -124,6 +124,11 @@ namespace WebApi_Mun.Models
         public double? Price { get; set; }
 
         /// <summary>
+        /// Precio
+        /// </summary>
+        public double? PriceWithDiscount { get; set; }
+        
+        /// <summary>
         /// Imagen destacada
         /// </summary>
         public string ImageName { get; set; }
