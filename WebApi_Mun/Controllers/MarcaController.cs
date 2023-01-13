@@ -79,6 +79,30 @@ namespace WebApi_Mun.Controllers
         }
 
         /// <summary>
+        /// Listado de todas las marcas segun categorias
+        /// </summary>
+        [Route("api/marca/listByCategory/{categoryId}")]
+        [HttpGet]
+        public IHttpActionResult ListByCategory(int categoryId)
+        {
+            try
+            {
+                var list = mar.GetMarcasByCategory(categoryId);
+                if (list == null)
+                {
+                    return NotFound();
+                }
+
+                return Ok(list);
+
+            }
+            catch (Exception ex)
+            {
+                return Content(HttpStatusCode.NotFound, ex.Message);
+            }
+        }
+
+        /// <summary>
         /// Graba los datos de la marca
         /// </summary>
         /// <param name="data">Datos de la marca</param>

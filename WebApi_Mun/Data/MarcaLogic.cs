@@ -111,6 +111,65 @@ namespace WebApi_Mun.Data
 
         }
 
+
+        private const string SELECT_ALL =
+        ";Select cm.MarcaId, c.[Name] " +
+        " from[dbo].[CategoryMarcas] cm " +
+        " inner join Marcas c on c.MarcaId=cm.MarcaId where cm.CategoryId = {};";
+
+        /// <summary>
+        /// Devuelve marcas segun la categorias asociada
+        /// </summary>
+        /// <param name="categoryId">Identificador del categoria</param>
+        /// <returns>Lista de marcas</returns>
+        public List<MarcaModel> GetMarcasByCategory(int categoryId)
+        {
+            var items = new List<MarcaModel>();
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                SqlCommand objSqlCmd = new SqlCommand("", connection);
+
+                string strFilter = string.Empty;
+
+                strFilter += "@CatgeoryId";
+                objSqlCmd.Parameters.Add("@CatgeoryId", SqlDbType.Int).Value = categoryId;
+
+                string strWithParams = string.Format(SELECT_ALL, strFilter);
+                objSqlCmd.CommandType = CommandType.Text;
+
+                connection.Open();
+
+#if DEBUG
+                System.Diagnostics.Trace.WriteLine(objSqlCmd.CommandText);
+#endif
+
+                SqlDataAdapter adapter = new SqlDataAdapter();
+                adapter.SelectCommand = objSqlCmd;
+
+                DataSet dataset = new DataSet();
+                adapter.Fill(dataset);
+
+                var tab = dataset.Tables[1].Rows;
+
+                //lista para devolver los datos mapeados ProductModelList
+                List<MarcaModel> list = new List<MarcaModel>();
+                foreach (DataRow row in tab)
+                {
+                    MarcaModel cat = new MarcaModel();
+                    cat.MarcaId = Convert.ToInt32(row["MarcaId"]);
+                    cat.Name = Convert.ToString(row["Name"]);
+
+                    list.Add(cat);
+                }
+                connection.Close();
+                return (list);
+            }
+
+        }
+
+
+
         /// <summary>
         /// Graba la marca
         /// </summary>

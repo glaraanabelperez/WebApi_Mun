@@ -105,6 +105,64 @@ namespace WebApi_Mun.Data
 
         }
 
+
+        private const string SELECT_ALL =
+        ";Select cm.CategoryId, c.[Name] " +
+        " from[dbo].[CategoryMarcas] cm " +
+        " inner join Categories c on c.CategoryId=cm.CategoryId where cm.MarcaId = {};" ;
+ 
+        /// <summary>
+        /// Devuelve categorias segun la marca asociada
+        /// </summary>
+        /// <param name="marcaId">Identificador del marca</param>
+        /// <returns>Lista de Catgeorias</returns>
+        public List<CategoryModel> GetCategoriesByMarca(int marcaId)
+        {
+            var items = new List<CategoryModel>();
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                SqlCommand objSqlCmd = new SqlCommand("", connection);
+
+                string strFilter = string.Empty;
+   
+                strFilter += "@MarcaId";
+                objSqlCmd.Parameters.Add("@MarcaId", SqlDbType.Int).Value = marcaId;
+
+                string strWithParams = string.Format(SELECT_ALL, strFilter);
+                objSqlCmd.CommandType = CommandType.Text;
+
+                connection.Open();
+
+#if DEBUG
+                System.Diagnostics.Trace.WriteLine(objSqlCmd.CommandText);
+#endif
+
+                SqlDataAdapter adapter = new SqlDataAdapter();
+                adapter.SelectCommand = objSqlCmd;
+
+                DataSet dataset = new DataSet();
+                adapter.Fill(dataset);
+
+                var tab = dataset.Tables[1].Rows;
+
+                //lista para devolver los datos mapeados ProductModelList
+                List<CategoryModel> list = new List<CategoryModel>();
+                foreach (DataRow row in tab)
+                {
+                    CategoryModel cat = new CategoryModel();
+                    cat.CategoryId = Convert.ToInt32(row["CategoryId"]);
+                    cat.Name = Convert.ToString(row["Name"]);
+
+                    list.Add(cat);
+                }
+                connection.Close();
+                return (list);
+            }
+
+        }
+
+
         /// <summary>
         /// Graba la categoria
         /// </summary>
