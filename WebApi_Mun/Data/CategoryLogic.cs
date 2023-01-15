@@ -109,7 +109,7 @@ namespace WebApi_Mun.Data
         private const string SELECT_ALL =
         ";Select cm.CategoryId, c.[Name] " +
         " from[dbo].[CategoryMarcas] cm " +
-        " inner join Categories c on c.CategoryId=cm.CategoryId where cm.MarcaId = {};" ;
+        " inner join Categories c on c.CategoryId=cm.CategoryId where cm.MarcaId = {0};" ;
  
         /// <summary>
         /// Devuelve categorias segun la marca asociada
@@ -144,7 +144,7 @@ namespace WebApi_Mun.Data
                 DataSet dataset = new DataSet();
                 adapter.Fill(dataset);
 
-                var tab = dataset.Tables[1].Rows;
+                var tab = dataset.Tables[0].Rows;
 
                 //lista para devolver los datos mapeados ProductModelList
                 List<CategoryModel> list = new List<CategoryModel>();

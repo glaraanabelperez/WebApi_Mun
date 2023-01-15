@@ -115,7 +115,7 @@ namespace WebApi_Mun.Data
         private const string SELECT_ALL =
         ";Select cm.MarcaId, c.[Name] " +
         " from[dbo].[CategoryMarcas] cm " +
-        " inner join Marcas c on c.MarcaId=cm.MarcaId where cm.CategoryId = {};";
+        " inner join Marcas c on c.MarcaId=cm.MarcaId {0};";
 
         /// <summary>
         /// Devuelve marcas segun la categorias asociada
@@ -132,13 +132,14 @@ namespace WebApi_Mun.Data
 
                 string strFilter = string.Empty;
 
-                strFilter += "@CatgeoryId";
+                strFilter += "where cm.CategoryId = @CatgeoryId";
                 objSqlCmd.Parameters.Add("@CatgeoryId", SqlDbType.Int).Value = categoryId;
 
                 string strWithParams = string.Format(SELECT_ALL, strFilter);
                 objSqlCmd.CommandType = CommandType.Text;
 
                 connection.Open();
+                objSqlCmd.CommandText = strWithParams;
 
 #if DEBUG
                 System.Diagnostics.Trace.WriteLine(objSqlCmd.CommandText);
@@ -150,7 +151,7 @@ namespace WebApi_Mun.Data
                 DataSet dataset = new DataSet();
                 adapter.Fill(dataset);
 
-                var tab = dataset.Tables[1].Rows;
+                var tab = dataset.Tables[0].Rows;
 
                 //lista para devolver los datos mapeados ProductModelList
                 List<MarcaModel> list = new List<MarcaModel>();

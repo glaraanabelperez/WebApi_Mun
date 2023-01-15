@@ -194,6 +194,7 @@ namespace WebApi_Mun.Data
                 List<ProductModelDto> productList = new List<ProductModelDto>();
                 foreach (DataRow row in tab)
                 {
+                    var price = Convert.ToDouble(row["Price"]);
                     ProductModelDto product = new ProductModelDto();
                     product.ProductId = Convert.ToInt32(row["ProductId"]);
                     product.Name = Convert.ToString(row["ProductName"]);
@@ -201,7 +202,12 @@ namespace WebApi_Mun.Data
                     product.CategoryName = Convert.ToString(row["CategoryName"]);
                     product.MarcaName = Convert.ToString(row["MarcaName"]);
                     if (!row.IsNull("DiscountAmount"))
-                        product.DiscountAmount = Convert.ToInt32(row["DiscountAmount"]);
+                    {
+                        var discount = (Convert.ToInt32(row["DiscountAmount"]));
+                        product.DiscountAmount = discount;
+                        product.PriceWithDiscount = price - (price * discount / 100);
+                    }
+                        
                     if (!row.IsNull("Stock"))
                         product.Stock = Convert.ToBoolean(row["Stock"]);
                     product.Featured = Convert.ToBoolean(row["Featured"]);
