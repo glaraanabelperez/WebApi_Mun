@@ -134,6 +134,9 @@ namespace WebApi_Mun.Data
 
                 connection.Open();
 
+
+                objSqlCmd.CommandText =  strWithParams;
+
 #if DEBUG
                 System.Diagnostics.Trace.WriteLine(objSqlCmd.CommandText);
 #endif

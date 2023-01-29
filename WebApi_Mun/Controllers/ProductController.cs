@@ -142,7 +142,6 @@ namespace WebApi_Mun.Controllers
 
                 if (result > 0)
                 {
-                    this.imagenLogic.DeleteFolder(itemId);
                     return Ok();
                 }
                 else

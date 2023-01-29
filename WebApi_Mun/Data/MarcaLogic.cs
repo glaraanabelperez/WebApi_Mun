@@ -112,17 +112,20 @@ namespace WebApi_Mun.Data
         }
 
 
-        private const string SELECT_ALL =
+        private  string SELECT_ALL_BY_MARCA =
         ";Select cm.MarcaId, c.[Name] " +
-        " from[dbo].[CategoryMarcas] cm " +
-        " inner join Marcas c on c.MarcaId=cm.MarcaId {0};";
+        " from[dbo].[CategoryMarcas] cm ";
+
+        private string SELECT_ALL =
+        ";Select cm.MarcaId, c.[Name] " +
+        " from[dbo].[Marcas] cm ";
 
         /// <summary>
         /// Devuelve marcas segun la categorias asociada
         /// </summary>
         /// <param name="categoryId">Identificador del categoria</param>
         /// <returns>Lista de marcas</returns>
-        public List<MarcaModel> GetMarcasByCategory(int categoryId)
+        public List<MarcaModel> GetMarcasByCategory(int? categoryId)
         {
             var items = new List<MarcaModel>();
 
@@ -131,11 +134,22 @@ namespace WebApi_Mun.Data
                 SqlCommand objSqlCmd = new SqlCommand("", connection);
 
                 string strFilter = string.Empty;
+                string strWithParams= string.Empty;
 
-                strFilter += "where cm.CategoryId = @CatgeoryId";
-                objSqlCmd.Parameters.Add("@CatgeoryId", SqlDbType.Int).Value = categoryId;
+                if (categoryId.HasValue)
+                {
 
-                string strWithParams = string.Format(SELECT_ALL, strFilter);
+                    strFilter += "where cm.CategoryId = @CatgeoryId";
+                    objSqlCmd.Parameters.Add("@CatgeoryId", SqlDbType.Int).Value = categoryId;
+                    strWithParams += SELECT_ALL_BY_MARCA + "inner join Marcas c on c.MarcaId = cm.MarcaId {0}";
+
+                    strWithParams = string.Format(strWithParams, strFilter);
+                }
+                else
+                {
+                    strWithParams = SELECT_ALL;
+                }
+
                 objSqlCmd.CommandType = CommandType.Text;
 
                 connection.Open();

@@ -8,6 +8,8 @@ using System.Web.Http;
 using System.Web.Http.Cors;
 using WebApi_Mun.Data;
 using WebApi_Mun.Models;
+using System.Drawing.Imaging;
+using System.Drawing;
 
 namespace WebApi_Mun.Controllers
 {
@@ -53,7 +55,7 @@ namespace WebApi_Mun.Controllers
                 {
                     string pathString = System.IO.Path.Combine(this.ruta, image.ProductId.ToString());
 
-                    if (ModelState.IsValid && image.ProductImageId.HasValue)
+                    if (image.ProductImageId!=0 && image.ProductImageId.HasValue && !String.IsNullOrEmpty(image.Name))
                     {
 
                         int result = imagenLogic.Delete(image);
@@ -79,11 +81,12 @@ namespace WebApi_Mun.Controllers
         [HttpPost]
         public IHttpActionResult verifyImageOnserver([FromBody] ProductImageDto image)
         {
-            string pathString = System.IO.Path.Combine(this.ruta, image.ProductId.ToString());
 
-            if (ModelState.IsValid)
+            if (image.ProductId!=0)
             {
-                if (!File.Exists(pathString + "\\" + image.Name))
+                string pathString = System.IO.Path.Combine(this.ruta, image.ProductId.ToString());
+
+                if (!File.Exists((pathString + "\\" + image.Name)))
                 {
                     return Ok();
                 }
@@ -101,42 +104,53 @@ namespace WebApi_Mun.Controllers
         [HttpPut]
         public IHttpActionResult InsertImage(int productId)
         {
-            // To create a string that specifies the path to a subfolder under your
-            // top-level folder, add a name for the subfolder to folderName.
-            string pathString = System.IO.Path.Combine(this.ruta, productId.ToString());
-            if (!System.IO.File.Exists(pathString))
+            if (productId != 0)
             {
-                System.IO.Directory.CreateDirectory(pathString);
-            }
-
-            try
-            {
-                var httpRequest = HttpContext.Current.Request;
-                if (httpRequest.Files.Count > 0)
+                // To create a string that specifies the path to a subfolder under your
+                // top-level folder, add a name for the subfolder to folderName.
+                string pathString = System.IO.Path.Combine(this.ruta, productId.ToString());
+                if (!System.IO.File.Exists(pathString))
                 {
-                    var docfiles = new List<string>();
-                    for (var i = 0; i < httpRequest.Files.Count; i++)
+                    System.IO.Directory.CreateDirectory(pathString);
+                }
+
+                try
+                {
+                    var httpRequest = HttpContext.Current.Request;
+                    if (httpRequest.Files.Count > 0)
                     {
-                        var postedFile = httpRequest.Files[i];
-                        var filePath = System.IO.Path.Combine(pathString, postedFile.FileName);
-                        postedFile.SaveAs(filePath);
-                        docfiles.Add(filePath);
+                        for (var i = 0; i < httpRequest.Files.Count; i++)
+                        {
+                            var postedFile = httpRequest.Files[i];
+                            var filePath = System.IO.Path.Combine(pathString, postedFile.FileName);
+                            postedFile.SaveAs(filePath);
+                            imagenLogic.Save(postedFile.FileName, productId);
 
-                        imagenLogic.Save(postedFile.FileName, productId);
+                            byte[] datosArchivo = null;
+                            using (var binaryReader = new BinaryReader(postedFile.InputStream))
+                            {
+                                datosArchivo = binaryReader.ReadBytes(postedFile.ContentLength);
+                            }
 
+                            System.IO.File.WriteAllBytes(filePath, datosArchivo);
+
+                        }
+                        return Ok();
                     }
-                    return Ok();
+                    else
+                    {
+                        return BadRequest();
+                    }
                 }
-                else
+                catch (Exception e)
                 {
-                    return BadRequest();
+                    return InternalServerError(e);
                 }
             }
-            catch (Exception e)
-            {
-                return InternalServerError(e);
+            else{
+                return BadRequest();
             }
-          
+            
         }
 
     }
