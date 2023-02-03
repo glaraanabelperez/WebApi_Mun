@@ -4,6 +4,7 @@ using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.IO;
+using System.Linq;
 using WebApi_Mun.Models;
 
 namespace WebApi_Mun.Data
@@ -11,6 +12,7 @@ namespace WebApi_Mun.Data
     public class ImageLogic
     {
         static string connectionString = ConfigurationManager.ConnectionStrings["MundoConnection"].ConnectionString;
+        string ruta = @"C:\Users\LARA\source\repos\Client_Mundo\src\assets";
 
         /// <summary>
         /// Devuelve todos las imagenes segun el producto
@@ -107,22 +109,34 @@ namespace WebApi_Mun.Data
 
         }
 
-        public void DeleteFolder(int productId)
-        {
-            string ruta = @"C:\Users\LARA\source\repos\Client_Mundo\src\assets";
+        //public void DeleteFolder(int productId)
+        //{
+        //    string ruta = @"C:\Users\LARA\source\repos\Client_Mundo\src\assets";
 
-            try
-            {
-               string pathString = System.IO.Path.Combine(ruta, productId.ToString());
-               if (File.Exists(pathString ))
-               {
-                    System.IO.Directory.Delete(pathString);
-               }
+        //    try
+        //    {
+        //       string pathString = System.IO.Path.Combine(ruta, productId.ToString());
+        //       if (File.Exists(pathString ))
+        //       {
+        //            System.IO.Directory.Delete(pathString);
+        //       }
                
-            }
-            catch (Exception ex)
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw ex;
+        //    }
+        //}
+
+        public void CleanFolder(int productId)
+        {
+            string pathString = System.IO.Path.Combine(this.ruta, productId.ToString());
+
+            List<string> strFiles = Directory.GetFiles(pathString, "*", SearchOption.AllDirectories).ToList();
+
+            foreach (string fichero in strFiles)
             {
-                throw ex;
+                File.Delete(fichero);
             }
         }
 

@@ -106,17 +106,21 @@ namespace WebApi_Mun.Data
         }
 
 
-        private const string SELECT_ALL =
+        private const string SELECT_BY =
         ";Select cm.CategoryId, c.[Name] " +
         " from[dbo].[CategoryMarcas] cm " +
         " inner join Categories c on c.CategoryId=cm.CategoryId where cm.MarcaId = {0};" ;
- 
+
+        private const string SELECT_ALL =
+        ";Select CategoryId, [Name] " +
+        " from[dbo].[Categories]  ";
+
         /// <summary>
         /// Devuelve categorias segun la marca asociada
         /// </summary>
         /// <param name="marcaId">Identificador del marca</param>
         /// <returns>Lista de Catgeorias</returns>
-        public List<CategoryModel> GetCategoriesByMarca(int marcaId)
+        public List<CategoryModel> GetCategoriesByMarca(int? marcaId)
         {
             var items = new List<CategoryModel>();
 
@@ -124,18 +128,22 @@ namespace WebApi_Mun.Data
             {
                 SqlCommand objSqlCmd = new SqlCommand("", connection);
 
-                string strFilter = string.Empty;
-   
-                strFilter += "@MarcaId";
-                objSqlCmd.Parameters.Add("@MarcaId", SqlDbType.Int).Value = marcaId;
+                if (marcaId.HasValue)
+                {
+                    string strFilter = string.Empty;
 
-                string strWithParams = string.Format(SELECT_ALL, strFilter);
-                objSqlCmd.CommandType = CommandType.Text;
+                    strFilter += "@MarcaId";
+                    objSqlCmd.Parameters.Add("@MarcaId", SqlDbType.Int).Value = marcaId;
 
-                connection.Open();
-
-
-                objSqlCmd.CommandText =  strWithParams;
+                    string strWithParams = string.Format(SELECT_BY, strFilter);
+                    objSqlCmd.CommandType = CommandType.Text;
+                    connection.Open();
+                    objSqlCmd.CommandText = strWithParams;
+                }
+                else
+                {
+                    objSqlCmd.CommandText = SELECT_ALL;
+                } 
 
 #if DEBUG
                 System.Diagnostics.Trace.WriteLine(objSqlCmd.CommandText);

@@ -81,7 +81,8 @@ namespace WebApi_Mun.Controllers
         /// <summary>
         /// Listado de todas las marcas segun categorias
         /// </summary>
-        [Route("api/marca/listByCategory/{categoryId?}")]
+        [Route("api/marca/listByCategory/")]
+        [Route("api/marca/listByCategory/{categoryId}")]
         [HttpGet]
         public IHttpActionResult ListByCategory(int? categoryId)
         {

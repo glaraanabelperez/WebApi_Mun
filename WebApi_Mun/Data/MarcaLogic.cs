@@ -117,8 +117,8 @@ namespace WebApi_Mun.Data
         " from[dbo].[CategoryMarcas] cm ";
 
         private string SELECT_ALL =
-        ";Select cm.MarcaId, c.[Name] " +
-        " from[dbo].[Marcas] cm ";
+        ";Select MarcaId, [Name] " +
+        " from[dbo].[Marcas] ";
 
         /// <summary>
         /// Devuelve marcas segun la categorias asociada
