@@ -132,13 +132,13 @@ namespace WebApi_Mun.Data
 
                 if (filter != null)
                 {
-                    if (filter.CategoryId.HasValue)
+                    if (filter.CategoryId.HasValue && filter.CategoryId != null)
                     {
                         strFilter += " AND [A].CategoryId_FK=@Id_Category";
                         objSqlCmd.Parameters.Add("@Id_Category", SqlDbType.Int).Value = filter.CategoryId.Value;
 
                     }
-                    if (filter.MarcaId.HasValue)
+                    if (filter.MarcaId.HasValue && filter.MarcaId != null)
                     {
                         strFilter += " AND [A].MarcaId_FK=@Id_Marca";
                         objSqlCmd.Parameters.Add("@Id_Marca", SqlDbType.Int).Value = filter.MarcaId.Value;
@@ -406,3 +406,6 @@ namespace WebApi_Mun.Data
 
     }
 }
+
+
+

@@ -109,24 +109,24 @@ namespace WebApi_Mun.Data
 
         }
 
-        //public void DeleteFolder(int productId)
-        //{
-        //    string ruta = @"C:\Users\LARA\source\repos\Client_Mundo\src\assets";
+        public void DeleteFolder(int productId)
+        {
+            string ruta = @"C:\Users\LARA\source\repos\Client_Mundo\src\assets";
 
-        //    try
-        //    {
-        //       string pathString = System.IO.Path.Combine(ruta, productId.ToString());
-        //       if (File.Exists(pathString ))
-        //       {
-        //            System.IO.Directory.Delete(pathString);
-        //       }
-               
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw ex;
-        //    }
-        //}
+            try
+            {
+                string pathString = System.IO.Path.Combine(ruta, productId.ToString());
+                if (File.Exists(pathString))
+                {
+                    System.IO.Directory.Delete(pathString);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
 
         public void CleanFolder(int productId)
         {
