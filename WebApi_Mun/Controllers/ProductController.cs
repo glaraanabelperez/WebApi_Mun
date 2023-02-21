@@ -154,7 +154,22 @@ namespace WebApi_Mun.Controllers
             }
         }
 
-
+        /// <summary>
+        /// Listado de todos los productos 
+        /// </summary>
+        [Route("api/Product/price/{percent}/{category}/{marca}")]
+        [HttpGet]
+        public IHttpActionResult ChangePrice(decimal percent, int category, int marca)
+        {
+            try
+            {
+                prodLogic.ChangePrice(percent, category, marca);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return Content(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
     }
-
 }

@@ -28,7 +28,7 @@ namespace WebApi_Mun.Data
             /// <summary>
             /// Nombre del producto
             /// </summary>
-            Name = 1
+            ProductName = 1
 
         }
 
@@ -69,7 +69,7 @@ namespace WebApi_Mun.Data
             /// </summary>
             public int? MarcaId { get; set; }
 
-
+            public string Search { get; set; }
         }
 
         #endregion
@@ -121,7 +121,7 @@ namespace WebApi_Mun.Data
             if (orderField.HasValue)
                 strOrderField = orderField.ToString();
             else
-                strOrderField = OrderFields.Name.ToString();
+                strOrderField = OrderFields.ProductName.ToString();
 
             using (var connection = new SqlConnection(connectionString))
             {
@@ -158,11 +158,13 @@ namespace WebApi_Mun.Data
                     {
                         strFilter += " AND [A].DiscountId_FK is not null";
                     }
-                    //if (!string.IsNullOrWhiteSpace(filter.FreeText))
-                    //{
-                    //    strFilter += " AND CONTAINS(R.*, @FreeText )";
-                    //    objSqlCmd.Parameters.Add("@FreeText", SqlDbType.NVarChar, 1000).Value = filter.FreeText;
-                    //}
+                    if (!string.IsNullOrWhiteSpace(filter.Search))
+                    {
+                        //strFilter += " AND CONTAINS(R.*, @FreeText )";
+                        strFilter += " AND A.[Name] LIKE CONCAT('%',@FreeText,'%') ";
+                        objSqlCmd.Parameters.Add("@FreeText", SqlDbType.NVarChar, 1000).Value = "pampers";
+
+                    }
 
                 }
 
@@ -291,13 +293,13 @@ namespace WebApi_Mun.Data
 
                     while (objDR.Read())
                     {
-                        var price = (Math.Truncate((double)objDR.GetDecimal(3) * 100) / 100);
                         
 
                         var c = new ProductModelDto();
                         c.ProductId = objDR.GetInt32(0);
                         c.Name = objDR.GetString(1);
                         c.Description = objDR.GetString(2);
+                        var price = (Math.Truncate((double)objDR.GetDecimal(3) * 100) / 100);
                         c.Price = price ;
                         if (!objDR.IsDBNull(4))
                         {
@@ -311,8 +313,11 @@ namespace WebApi_Mun.Data
                             c.PriceWithDiscount = price;
                         }
                         c.MarcaName = objDR.GetString(5);
-                        c.CategoryName = objDR.GetString(6); 
-                        c.ImageName = objDR.GetString(7);
+                        c.CategoryName = objDR.GetString(6);
+                        if (!objDR.IsDBNull(7))
+                        {
+                            c.ImageName = objDR.GetString(7);
+                        }
                         items.Add(c);
                     }
                     return items.ToArray();
@@ -402,8 +407,33 @@ namespace WebApi_Mun.Data
             }
         }
 
+        public void ChangePrice(decimal pricePercent, int category, int marca)
+        {
+            using (var connection = new SqlConnection(connectionString))
+            {
+
+                connection.Open();
+                string queryString = " UPDATE [MundoPanal2].[dbo].[Products] " +
+                                     " SET PRICE=(@percent * PRICE/100)+ PRICE " +
+                                     " WHERE [CategoryId_FK] = @category and [MarcaId_FK] = @marca";
+
+                SqlCommand command = new SqlCommand(queryString, connection);
+                command.Parameters.AddWithValue("percent", pricePercent);
+                command.Parameters.AddWithValue("category", category);
+                command.Parameters.AddWithValue("marca", marca);
+
+#if DEBUG
+                System.Diagnostics.Trace.WriteLine(command.CommandText);
+#endif
+                Int32 recordsAffected = command.ExecuteNonQuery();
 
 
+                connection.Close();
+
+
+
+            }
+        }
     }
 }
 

@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Net.Mail;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
 using System.Web.Http;
 using System.Web.Http.Cors;
 using WebApi_Mun.Data;
@@ -109,6 +112,38 @@ namespace WebApi_Mun.Controllers
                 }
             }
             return BadRequest("El modelo de datos esta incorrecto o vacio");
+        }
+
+        [Route("api/User/email")]
+        [HttpGet]
+        public IHttpActionResult SendEmail()
+        {
+          
+            try
+            {
+                MailMessage correo = new MailMessage();
+                correo.From = new MailAddress("glaraanabelperez@gmail.com", "Kyocode", System.Text.Encoding.UTF8);//Correo de salida
+                correo.To.Add("glaraanabelperez@gmail.com"); //Correo destino?
+                correo.Subject = "Correo de prueba"; //Asunto
+                correo.Body = "Este es un correo de prueba desde c#"; //Mensaje del correo
+                correo.IsBodyHtml = true;
+                correo.Priority = MailPriority.Normal;
+                SmtpClient smtp = new SmtpClient();
+                smtp.UseDefaultCredentials = false;
+                smtp.Host = "smtp.gmail.com"; //Host del servidor de correo
+                smtp.Port = 25; //Puerto de salida
+                smtp.Credentials = new System.Net.NetworkCredential("glaraanabelperez@gmail.com", "30608545jose");//Cuenta de correo
+                ServicePointManager.ServerCertificateValidationCallback = delegate (object s, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors) { return true; };
+                smtp.EnableSsl = true;//True si el servidor de correo permite ssl
+                smtp.Send(correo);
+
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return Content(HttpStatusCode.InternalServerError, e.Message);
+            }
+          
         }
 
     }
