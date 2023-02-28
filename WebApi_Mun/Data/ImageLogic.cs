@@ -1,4 +1,7 @@
-﻿using System;
+﻿using MercadoPago.Resource.Common;
+using MercadoPago.Resource.User;
+using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
@@ -103,10 +106,7 @@ namespace WebApi_Mun.Data
    
                     return result;
                 }
-
             }
-
-
         }
 
         public void DeleteFolder(int productId)
@@ -116,13 +116,15 @@ namespace WebApi_Mun.Data
             try
             {
                 string pathString = System.IO.Path.Combine(ruta, productId.ToString());
-                if (File.Exists(pathString))
-                {
+                if (System.IO.Directory.Exists(pathString))
+                {            
                     System.IO.Directory.Delete(pathString);
+                    //System.IO.File.Delete(pathString);
+
                 }
 
             }
-            catch (Exception ex)
+            catch (IOException ex)
             {
                 throw ex;
             }
@@ -131,13 +133,17 @@ namespace WebApi_Mun.Data
         public void CleanFolder(int productId)
         {
             string pathString = System.IO.Path.Combine(this.ruta, productId.ToString());
-
-            List<string> strFiles = Directory.GetFiles(pathString, "*", SearchOption.AllDirectories).ToList();
-
-            foreach (string fichero in strFiles)
+            if (Directory.Exists(pathString))
             {
-                File.Delete(fichero);
+                List<string> strFiles = Directory.GetFiles(pathString, "*", SearchOption.AllDirectories).ToList();
+
+                foreach (string fichero in strFiles)
+                {
+                    System.IO.File.Delete(fichero);
+                    //File.Delete(fichero);
+                }
             }
+           
         }
 
     }

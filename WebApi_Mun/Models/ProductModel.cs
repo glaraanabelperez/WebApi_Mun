@@ -37,7 +37,7 @@ namespace WebApi_Mun.Models
         /// <summary>
         /// Precio
         /// </summary>
-        public double? Price { get; set; }
+        public decimal? Price { get; set; }
 
 
         /// <summary>
@@ -121,19 +121,17 @@ namespace WebApi_Mun.Models
         /// <summary>
         /// Precio
         /// </summary>
-        public double? Price { get; set; }
+        public decimal Price { get; set; }
 
         /// <summary>
         /// Precio
         /// </summary>
-        public double? PriceWithDiscount { get; set; }
+        public decimal? PriceWithDiscount { get; set; }
         
         /// <summary>
         /// Imagen destacada
         /// </summary>
         public string ImageName { get; set; }
-
-  
 
     }
 }

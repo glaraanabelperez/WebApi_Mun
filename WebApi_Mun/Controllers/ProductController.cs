@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Web.Http;
 using System.Web.Http.Cors;
@@ -38,6 +39,28 @@ namespace WebApi_Mun.Controllers
 }
 
         /// <summary>
+        /// Listado de todos los productos 
+        /// </summary>
+        [Route("api/ProductToCard/{productId}")]
+        [HttpGet]
+        public IHttpActionResult GetProductWithImages(int productId)
+        {
+            try
+            {
+                ProductModelDto prod = prodLogic.GetProductWithImages(productId);
+                if (prod == null)
+                {
+                    return Content(HttpStatusCode.NotFound, "La solicitud no arroja resultados");
+                }
+                return Ok(prod);
+            }
+            catch (Exception ex)
+            {
+                return Content(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+  
+        /// <summary>
         /// Listado de todas las marcas
         /// </summary>
         [Route("api/products/list_feature")]
@@ -68,6 +91,7 @@ namespace WebApi_Mun.Controllers
         [HttpPost]
         //[Authorize(Roles = "Admin")]
         public DataTableModel List([FromBody] QueryDataModel<Data.ProductLogic.Filter, Data.ProductLogic.OrderFields> queryData)
+        
         {
 
             return prodLogic.List(queryData.OrderField, queryData.OrderAsc, queryData.Filter, queryData.From, queryData.Length, out int RecordCount);
@@ -87,8 +111,8 @@ namespace WebApi_Mun.Controllers
             {
                 try
                 {
-                    var result = prodLogic.Save(data);
-                    return Ok(result);
+                    prodLogic.Save(data);
+                    return Ok();
                 }
                 catch (Exception e)
                 {
@@ -108,11 +132,8 @@ namespace WebApi_Mun.Controllers
             {
                 try
                 {
-                    var prod = prodLogic.Save(data);
-                    if (prod <= 0)
-                        return Content(HttpStatusCode.BadRequest, "Los datos solicitados no existen");
-
-                    return Ok(prodLogic.Save(data));
+                    prodLogic.Save(data);
+                    return Ok();
                 }
                 catch (Exception e)
                 {
@@ -135,6 +156,7 @@ namespace WebApi_Mun.Controllers
         [HttpDelete]
         public IHttpActionResult ChangeState(int itemId)
         {
+            string ruta = @"C:\Users\LARA\source\repos\Client_Mundo\src\assets";
 
             try
             {
@@ -142,7 +164,11 @@ namespace WebApi_Mun.Controllers
 
                 if (result > 0)
                 {
-                    new ImageLogic().DeleteFolder(itemId);
+                    //string pathString = System.IO.Path.Combine(ruta, itemId.ToString());
+
+                     imagenLogic.CleanFolder(itemId);
+                     imagenLogic.DeleteFolder(itemId);
+
                     return Ok();
                 }
                 else

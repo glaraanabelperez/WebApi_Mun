@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Web;
@@ -79,7 +80,7 @@ namespace WebApi_Mun.Data
         private const string SELECT_ALL =
         ";SELECT A.ProductId, A.[Name] as ProductName,  A.[Description] " +
             " ,A.CategoryId_FK as CategoryId, o.[Name] as CategoryName, A.MarcaId_FK as MarcaId, mar.[Name] as MarcaName " +
-            " ,A.Price, A.DiscountId_FK as DiscountId, dis.[Amount] DiscountAmount, A.Stock, A.Featured ," +
+            " , ROUND(A.Price, 2, 1) as Price, A.DiscountId_FK as DiscountId, dis.[Amount] DiscountAmount, A.Stock, A.Featured ," +
             " (select top 1 Images.Name " +
             " from ProductImage" +
             " inner join Images on Images.ImageId=ProductImage.ImageId_FK " +
@@ -162,7 +163,7 @@ namespace WebApi_Mun.Data
                     {
                         //strFilter += " AND CONTAINS(R.*, @FreeText )";
                         strFilter += " AND A.[Name] LIKE CONCAT('%',@FreeText,'%') ";
-                        objSqlCmd.Parameters.Add("@FreeText", SqlDbType.NVarChar, 1000).Value = "pampers";
+                        objSqlCmd.Parameters.Add("@FreeText", SqlDbType.NVarChar, 1000).Value = filter.Search;
 
                     }
 
@@ -196,7 +197,7 @@ namespace WebApi_Mun.Data
                 List<ProductModelDto> productList = new List<ProductModelDto>();
                 foreach (DataRow row in tab)
                 {
-                    var price = Convert.ToDouble(row["Price"]);
+                    decimal price = Convert.ToDecimal(row["Price"]);
                     ProductModelDto product = new ProductModelDto();
                     product.ProductId = Convert.ToInt32(row["ProductId"]);
                     product.Name = Convert.ToString(row["ProductName"]);
@@ -213,7 +214,7 @@ namespace WebApi_Mun.Data
                     if (!row.IsNull("Stock"))
                         product.Stock = Convert.ToBoolean(row["Stock"]);
                     product.Featured = Convert.ToBoolean(row["Featured"]);
-                    product.Price = Convert.ToDouble(row["Price"]);
+                    product.Price = price;
                     product.ImageName = Convert.ToString(row["ImageName"]);
                     productList.Add(product);
                 }
@@ -258,7 +259,7 @@ namespace WebApi_Mun.Data
                         items.MarcaId = objDR.GetInt32(4);
                         if(!objDR.IsDBNull(5))
                             items.DiscountId = objDR.GetInt32(5);
-                        items.Price = (double)objDR.GetDecimal(6);
+                        items.Price = objDR.GetDecimal(6);
                         items.State = objDR.GetByte(7) == 0 ? false : true;
                         items.Stock = objDR.GetByte(8) == 0 ? false : true;
                         items.Featured = objDR.GetByte(9) == 0 ? false : true;
@@ -270,9 +271,69 @@ namespace WebApi_Mun.Data
                 {
                     throw ;
                 }
+            }
+        }
+
+        /// <summary>
+        /// Devuelve los datos de  producto
+        /// </summary>
+        /// <param name="userId">Identificador del producto</param>
+        /// <returns>Datos de producto</returns>
+        public ProductModelDto GetProductWithImages(int productId)
+        {
+            var items = new ProductModelDto();
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            using (SqlCommand objCmd = new SqlCommand("Product_GetWithImages", connection))
+            {
+                objCmd.Parameters.Add("@ProductId", SqlDbType.Int).Value = productId;
+                objCmd.CommandType = CommandType.StoredProcedure;
+                try
+                {
+                    connection.Open();
+                    using (SqlDataReader objDR = objCmd.ExecuteReader())
+                    {
+                        while (objDR.Read())
+                        {
+                            items.ProductId = objDR.GetInt32(0);
+                            items.Name = objDR.GetString(1);
+                            items.Description = objDR.GetString(2);
+                            items.CategoryName = objDR.GetString(3);
+                            items.MarcaName = objDR.GetString(4);
+
+                            var DiscountAmount = 0;
+                            if (!objDR.IsDBNull(5))
+                            {
+                                DiscountAmount = objDR.GetInt32(5);
+                                items.Price = objDR.GetDecimal(6);
+                                items.PriceWithDiscount = Math.Truncate(items.Price - (items.Price * DiscountAmount) / 100);
+                                items.DiscountAmount = DiscountAmount;
+                            }
+                            else
+                            {
+                                items.Price = objDR.GetDecimal(6);
+                                items.PriceWithDiscount = items.Price;
+                            }
+
+                            items.State = objDR.GetByte(7) == 0 ? false : true;
+                            items.Stock = objDR.GetByte(8) == 0 ? false : true;
+                            if (!objDR.IsDBNull(9))
+                                items.ImageName = objDR.GetString(9);
+                        }
+                    }
+                    return items;
+                }
+                catch(Exception e)
+                {
+                    throw e;
+                }
+                finally
+                {
+                    if (connection != null)
+                        connection.Dispose();
+                }
 
             }
-
 
         }
 
@@ -283,49 +344,56 @@ namespace WebApi_Mun.Data
         public ProductModelDto[]  GetProductsFeatured()
         {
             var items = new List<ProductModelDto>();
-            using (var connection = new SqlConnection(connectionString))
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            using (SqlCommand objCmd = new SqlCommand("Product_Featured", connection))
             {
-                using (var objCmd = new SqlCommand("Product_Featured", connection))
+                objCmd.CommandType = CommandType.StoredProcedure;
+                try
                 {
                     connection.Open();
-                    objCmd.CommandType = CommandType.StoredProcedure;
-                    SqlDataReader objDR = objCmd.ExecuteReader();
-
-                    while (objDR.Read())
+                    using (SqlDataReader objDR = objCmd.ExecuteReader())
                     {
-                        
+                        while (objDR.Read())
+                        {
+                            var c = new ProductModelDto();
+                            c.ProductId = objDR.GetInt32(0);
+                            c.Name = objDR.GetString(1);
+                            c.Description = objDR.GetString(2);
 
-                        var c = new ProductModelDto();
-                        c.ProductId = objDR.GetInt32(0);
-                        c.Name = objDR.GetString(1);
-                        c.Description = objDR.GetString(2);
-                        var price = (Math.Truncate((double)objDR.GetDecimal(3) * 100) / 100);
-                        c.Price = price ;
-                        if (!objDR.IsDBNull(4))
-                        {
-                            var priceDiscount = ((double)objDR.GetDecimal(3) - ((double)objDR.GetDecimal(3) * (int)objDR.GetByte(4)) / 100);
-                            priceDiscount = (Math.Truncate(priceDiscount * 100) / 100);
-                            c.DiscountAmount = (int)objDR.GetByte(4);
-                            c.PriceWithDiscount = priceDiscount;
+                            c.Price = (Math.Truncate(objDR.GetDecimal(3) * 100) / 100);
+                            var DiscountAmount = 0;
+                            if (!objDR.IsDBNull(4))
+                            {
+                                DiscountAmount = objDR.GetInt32(4);
+                                c.PriceWithDiscount = c.Price - (c.Price * DiscountAmount) / 100;
+                                c.DiscountAmount = DiscountAmount;
+                            }
+                            else
+                            {
+                                c.PriceWithDiscount = c.Price;
+                            }
+                            c.MarcaName = objDR.GetString(5);
+                            c.CategoryName = objDR.GetString(6);
+                            if (!objDR.IsDBNull(7))
+                            {
+                                c.ImageName = objDR.GetString(7);
+                            }
+                            items.Add(c);
                         }
-                        else
-                        {
-                            c.PriceWithDiscount = price;
-                        }
-                        c.MarcaName = objDR.GetString(5);
-                        c.CategoryName = objDR.GetString(6);
-                        if (!objDR.IsDBNull(7))
-                        {
-                            c.ImageName = objDR.GetString(7);
-                        }
-                        items.Add(c);
                     }
                     return items.ToArray();
-
                 }
-
+                catch (Exception e)
+                {
+                    throw e;
+                }
+                finally
+                {
+                    if (connection != null)
+                        connection.Dispose();
+                }
             }
-
         }
 
 
@@ -335,7 +403,7 @@ namespace WebApi_Mun.Data
         /// <param name="data">Datos del prodcuto</param>
         /// <param name="userId">Identificador del usuario que graba</param>
         /// <returns><c>true</c> Si se guardaron los datos, en caso contrario quiere decir que el nombre está repetido</returns>
-        public int Save(ProductModel data)
+        public void Save(ProductModel data)
         {
             using (var connection = new SqlConnection(connectionString))
             {
@@ -360,33 +428,18 @@ namespace WebApi_Mun.Data
                 objCmd.Parameters.Add("@Stock", SqlDbType.TinyInt).Value = (data.Stock == true ? 1 : 0);
                 objCmd.Parameters.Add("@Price", SqlDbType.Money).Value = data.Price;
 
-
-                //var result = objCmd.ExecuteNonQuery();
-
-               var result=0;
                try
                {
-                   connection.Open();
-                   using (var objDR = objCmd.ExecuteReader(CommandBehavior.SingleRow))
-                   {
-                       if (!objDR.Read())
-                       {
-                           return 0;
-                       }
-                   result = objDR.GetInt32(0);
-                   objDR.Close();
-                   connection.Close();
-                       
-                   return result;
-                      
-                   }
+                 connection.Open();
+                 var result = objCmd.ExecuteNonQuery();
+                 connection.Close();
+
                }
                catch (Exception e)
                {
                   throw e;
                }
             }
-
         }
 
         public int Desactive(int itemId)
@@ -403,6 +456,7 @@ namespace WebApi_Mun.Data
 
                 connection.Open();
                 var result = objCmd.ExecuteNonQuery();
+                connection.Close();
                 return result;
             }
         }
@@ -426,11 +480,7 @@ namespace WebApi_Mun.Data
                 System.Diagnostics.Trace.WriteLine(command.CommandText);
 #endif
                 Int32 recordsAffected = command.ExecuteNonQuery();
-
-
                 connection.Close();
-
-
 
             }
         }
