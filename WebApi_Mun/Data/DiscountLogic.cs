@@ -33,7 +33,7 @@ namespace WebApi_Mun.Data
                     {
                         var c = new DiscountModel();
                         c.DiscountId = objDR.GetInt32(0);
-                        c.Amount = objDR.GetByte(1);
+                        c.Amount = objDR.GetInt32(1);
                         c.CreatedBy= objDR.GetInt32(2);
                         c.State = objDR.GetByte(3) == 1 ? true : false;
 
@@ -66,7 +66,7 @@ namespace WebApi_Mun.Data
                     {
                         var c = new DiscountModel();
                         c.DiscountId = objDR.GetInt32(0);
-                        c.Amount = objDR.GetByte(1);
+                        c.Amount = objDR.GetInt32(1);
                         c.CreatedBy = objDR.GetInt32(2);
                         c.State = objDR.GetByte(3) == 1 ? true : false;
 
@@ -104,7 +104,7 @@ namespace WebApi_Mun.Data
                         }
 
                         items.DiscountId = objDR.GetInt32(0);
-                        items.Amount = objDR.GetByte(1);
+                        items.Amount = objDR.GetInt32(1);
                         items.CreatedBy = objDR.GetInt32(2);
                         items.State = objDR.GetByte(3) == 1 ? true : false;
 
@@ -138,7 +138,7 @@ namespace WebApi_Mun.Data
                     if (store.Equals("Discount_Update"))
                         objCmd.Parameters.Add("@DiscountId", SqlDbType.Int).Value = data.DiscountId;
                     objCmd.CommandType = CommandType.StoredProcedure;
-                    objCmd.Parameters.Add("@Amount", SqlDbType.TinyInt).Value = data.Amount;                 
+                    objCmd.Parameters.Add("@Amount", SqlDbType.Int).Value = data.Amount;                 
                     objCmd.Parameters.Add("@CreatedBy", SqlDbType.Int).Value = 1;
 
                     connection.Open();
@@ -161,10 +161,10 @@ namespace WebApi_Mun.Data
                 var store = "";
 
                 store = "Discount_Desactive";
-                objCmd = new SqlCommand(store, connection);
 
                 using (objCmd = new SqlCommand(store, connection))
                 {
+                    objCmd.CommandType = CommandType.StoredProcedure;
                     objCmd.Parameters.Add("@DiscountId", SqlDbType.Int).Value = itemId;
 
                     connection.Open();

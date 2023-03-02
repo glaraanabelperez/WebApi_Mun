@@ -100,33 +100,8 @@ namespace WebApi_Mun.Controllers
             return Ok(userItem);
         }
 
-        /// <summary>
-        /// Graba los datos del categoria
-        /// </summary>
-        /// <param name="data">Datos del categoria</param>
-        /// <returns><c>true</c> Si se guardaron los datos</returns>
-        [HttpPut]
-        public IHttpActionResult Put([FromBody] CategoryModel data)
-        {
-          
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    cat.Save(data);
-                    return Ok();
-                }
-                catch (Exception ex)
-                {
-                    return Content(HttpStatusCode.InternalServerError, ex.Message);
-                }        
-            }
-            return BadRequest("El modelo de datos esta incorrecto o vacio");
-        }
-
-
         [HttpPost]
-        public IHttpActionResult Update([FromBody] CategoryModel data)
+        public IHttpActionResult Post([FromBody] CategoryModel data)
         {
             if (ModelState.IsValid)
             {
@@ -134,7 +109,7 @@ namespace WebApi_Mun.Controllers
                 {
                     var result = cat.Save(data);
                     if (result <0)
-                        return Content(HttpStatusCode.NotFound, "El dato a editar no existe");
+                        return Content(HttpStatusCode.NotFound, "Error en la Accion");
 
                     return Ok();
                 }

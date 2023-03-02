@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Cors;
 using WebApi_Mun.Data;
@@ -79,40 +80,14 @@ namespace WebApi_Mun.Controllers
         }
 
         /// <summary>
-        /// Graba los datos del descuento 
-        /// </summary>
-        /// <param name="data">Datos del descuento</param>
-        /// <returns><c>true</c> Si se guardaron los datos</returns>
-        [HttpPut]
-        public IHttpActionResult Put([FromBody] DiscountModel data)
-        {
-
-            if (ModelState.IsValid)
-            {
-                var result = 0;
-                try
-                {
-                    result = dis.Save(data);
-                    return Ok();
-                }
-                catch (Exception ex)
-                {
-                    return Content(HttpStatusCode.InternalServerError, ex.Message);
-                }
-            }
-            
-            return BadRequest("El modelo de datos esta incorrecto o vacio");
-        }
-
-        /// <summary>
         /// Actualiza los datos del descuento
         /// </summary>
         /// <param name="data">Datos del decsuento</param>
         /// <returns><c>true</c> Si se guardaron los datos</returns>
+        [Route("api/discount")]
         [HttpPost]
-        public IHttpActionResult Post([FromBody] DiscountModel data)
+        public  IHttpActionResult Post([FromBody] DiscountModel data)
         {
-
             if (ModelState.IsValid)
             {
                 try
@@ -124,10 +99,8 @@ namespace WebApi_Mun.Controllers
                     }
                     else
                     {
-
-                        return BadRequest("El elemento a editar no existe");
+                        return BadRequest("NO SE PUDO COMPLETAR LA ACCION");
                     }
-
                 }
                 catch (Exception ex)
                 {
@@ -143,14 +116,14 @@ namespace WebApi_Mun.Controllers
         /// </summary>
         /// <param name="data">Datos del descuento</param>
         /// <returns><c>1</c> Si se guardaron los datos</returns>
-        [Route("api/discount/state/{itemId}")]
+        [Route("api/discount/state/{disId}")]
         [HttpDelete]
-        public IHttpActionResult ChangeState(int itemId)
+        public IHttpActionResult ChangeState(int disId)
         {
 
             try
             {
-                int result = dis.Desactive(itemId);
+                int result = dis.Desactive(disId);
 
                 if (result > 0)
                     return Ok();
@@ -162,6 +135,7 @@ namespace WebApi_Mun.Controllers
                 return Content(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
+
 
     }
 }

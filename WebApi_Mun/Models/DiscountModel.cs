@@ -17,7 +17,7 @@ namespace WebApi_Mun.Models
         /// <summary>
         /// Nombre
         /// </summary>
-        public byte Amount { get; set; }
+        public int Amount { get; set; }
 
         /// <summary>
         /// Nombre

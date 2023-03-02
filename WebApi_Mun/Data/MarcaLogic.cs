@@ -113,12 +113,14 @@ namespace WebApi_Mun.Data
 
 
         private  string SELECT_ALL_BY_MARCA =
-        ";Select cm.MarcaId, c.[Name] " +
-        " from[dbo].[CategoryMarcas] cm ";
+        ";Select cm.MarcaId, m.[Name] " +
+        " from[dbo].[CategoryMarcas] cm " +
+        " inner join Marcas m on m.MarcaId=cm.MarcaId where cm.CategoryId = {0} and m.[State]=1;";
+
 
         private string SELECT_ALL =
-        ";Select MarcaId, [Name] " +
-        " from[dbo].[Marcas] ";
+        ";Select m.MarcaId, m.[Name] " +
+        " from[dbo].[Marcas] m where m.[State]=1  ";
 
         /// <summary>
         /// Devuelve marcas segun la categorias asociada
@@ -138,22 +140,22 @@ namespace WebApi_Mun.Data
 
                 if (categoryId.HasValue)
                 {
+                    strFilter = string.Empty;
 
-                    strFilter += "where cm.CategoryId = @CatgeoryId";
+                    strFilter += "@CatgeoryId";
                     objSqlCmd.Parameters.Add("@CatgeoryId", SqlDbType.Int).Value = categoryId;
-                    strWithParams += SELECT_ALL_BY_MARCA + "inner join Marcas c on c.MarcaId = cm.MarcaId {0}";
 
-                    strWithParams = string.Format(strWithParams, strFilter);
+                    strWithParams = string.Format(SELECT_ALL_BY_MARCA, strFilter);
+                    objSqlCmd.CommandText = strWithParams;
                 }
                 else
                 {
-                    strWithParams = SELECT_ALL;
+                    objSqlCmd.CommandText = SELECT_ALL;
                 }
 
                 objSqlCmd.CommandType = CommandType.Text;
 
                 connection.Open();
-                objSqlCmd.CommandText = strWithParams;
 
 #if DEBUG
                 System.Diagnostics.Trace.WriteLine(objSqlCmd.CommandText);
@@ -182,8 +184,6 @@ namespace WebApi_Mun.Data
             }
 
         }
-
-
 
         /// <summary>
         /// Graba la marca

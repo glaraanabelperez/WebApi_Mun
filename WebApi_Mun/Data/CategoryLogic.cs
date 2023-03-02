@@ -109,11 +109,11 @@ namespace WebApi_Mun.Data
         private const string SELECT_BY =
         ";Select cm.CategoryId, c.[Name] " +
         " from[dbo].[CategoryMarcas] cm " +
-        " inner join Categories c on c.CategoryId=cm.CategoryId where cm.MarcaId = {0};" ;
+        " inner join Categories c on c.CategoryId=cm.CategoryId where cm.MarcaId = {0} and c.[State]=1;" ;
 
         private const string SELECT_ALL =
         ";Select CategoryId, [Name] " +
-        " from[dbo].[Categories]  ";
+        " from[dbo].[Categories] c where c.[State]=1 ";
 
         /// <summary>
         /// Devuelve categorias segun la marca asociada
