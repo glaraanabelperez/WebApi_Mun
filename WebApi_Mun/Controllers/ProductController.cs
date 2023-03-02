@@ -127,7 +127,7 @@ namespace WebApi_Mun.Controllers
         [HttpPut]
         public IHttpActionResult Update([FromBody] ProductModel data)
         {
-
+            data.DiscountId=data.DiscountId==0 ?null : data.DiscountId;
             if (ModelState.IsValid)
             {
                 try

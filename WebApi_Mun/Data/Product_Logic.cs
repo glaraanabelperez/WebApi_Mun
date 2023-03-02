@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NUnit.Framework.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
@@ -80,8 +81,8 @@ namespace WebApi_Mun.Data
         private const string SELECT_ALL =
         ";SELECT A.ProductId, A.[Name] as ProductName,  A.[Description] " +
             " ,A.CategoryId_FK as CategoryId, o.[Name] as CategoryName, A.MarcaId_FK as MarcaId, mar.[Name] as MarcaName " +
-            " , ROUND(A.Price, 2, 1) as Price, A.DiscountId_FK as DiscountId, dis.[Amount] DiscountAmount, A.Stock, A.Featured ," +
-            " (select top 1 Images.Name " +
+            " , ROUND(A.Price, 2, 1) as Price, A.DiscountId_FK as DiscountId, dis.[Amount] DiscountAmount, A.Stock, A.Featured , A.[PriceWithDiscount]" +
+            " ,(select top 1 Images.Name " +
             " from ProductImage" +
             " inner join Images on Images.ImageId=ProductImage.ImageId_FK " +
             " where ProductId_FK = A.ProductId" +
@@ -205,12 +206,9 @@ namespace WebApi_Mun.Data
                     product.CategoryName = Convert.ToString(row["CategoryName"]);
                     product.MarcaName = Convert.ToString(row["MarcaName"]);
                     if (!row.IsNull("DiscountAmount"))
-                    {
-                        var discount = (Convert.ToInt32(row["DiscountAmount"]));
-                        product.DiscountAmount = discount;
-                        product.PriceWithDiscount = price - (price * discount / 100);
-                    }
-                        
+                         product.DiscountAmount = (Convert.ToInt32(row["DiscountAmount"]));                 
+                    if (!row.IsNull("PriceWithDiscount"))
+                        product.PriceWithDiscount = Convert.ToDecimal(row["PriceWithDiscount"]);                   
                     if (!row.IsNull("Stock"))
                         product.Stock = Convert.ToBoolean(row["Stock"]);
                     product.Featured = Convert.ToBoolean(row["Featured"]);
@@ -306,7 +304,7 @@ namespace WebApi_Mun.Data
                             {
                                 DiscountAmount = objDR.GetInt32(5);
                                 items.Price = objDR.GetDecimal(6);
-                                items.PriceWithDiscount = Math.Truncate(items.Price - (items.Price * DiscountAmount) / 100);
+                                items.PriceWithDiscount = Math.Truncate((items.Price - (items.Price * DiscountAmount) / 100))*100/100;
                                 items.DiscountAmount = DiscountAmount;
                             }
                             else
