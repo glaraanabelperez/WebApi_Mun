@@ -6,6 +6,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.Serialization;
 using System.Web;
 using WebApi_Mun.Models;
@@ -466,8 +467,15 @@ namespace WebApi_Mun.Data
 
                 connection.Open();
                 string queryString = " UPDATE [MundoPanal2].[dbo].[Products] " +
-                                     " SET PRICE=(@percent * PRICE/100)+ PRICE " +
-                                     " WHERE [CategoryId_FK] = @category and [MarcaId_FK] = @marca";
+                                     " SET PRICE=((PRICE  * @percent)/100)+ PRICE " +
+                                     " WHERE [CategoryId_FK] = @category and [MarcaId_FK] = @marca" +
+                                     " UPDATE prod "+
+                                     " SET "+
+                                     " prod.PriceWithDiscount = prod.Price - d.Amount "+
+                                     " FROM[MundoPanal2].[dbo].[Products]  prod "+
+                                     " INNER JOIN Products p ON p.ProductId = prod.ProductId "+
+                                     " Inner Join Discounts d on d.DiscountId = prod.DiscountId_FK"+
+                                     "where prod.CategoryId_FK = 1 and prod.MarcaId_FK = 2 ";
 
                 SqlCommand command = new SqlCommand(queryString, connection);
                 command.Parameters.AddWithValue("percent", pricePercent);
