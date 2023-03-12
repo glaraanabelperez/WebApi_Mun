@@ -467,25 +467,32 @@ namespace WebApi_Mun.Data
 
                 connection.Open();
                 string queryString = " UPDATE [MundoPanal2].[dbo].[Products] " +
-                                     " SET PRICE=((PRICE  * @percent)/100)+ PRICE " +
-                                     " WHERE [CategoryId_FK] = @category and [MarcaId_FK] = @marca" +
+                                     " SET PRICE=((PRICE  * {0} )/100)+ PRICE " +
+                                     " WHERE [CategoryId_FK] = {1} and [MarcaId_FK] = {2} " +
                                      " UPDATE prod "+
                                      " SET "+
                                      " prod.PriceWithDiscount = prod.Price - d.Amount "+
                                      " FROM[MundoPanal2].[dbo].[Products]  prod "+
-                                     " INNER JOIN Products p ON p.ProductId = prod.ProductId "+
-                                     " Inner Join Discounts d on d.DiscountId = prod.DiscountId_FK"+
-                                     "where prod.CategoryId_FK = 1 and prod.MarcaId_FK = 2 ";
+                                     " INNER JOIN [MundoPanal2].[dbo].[Products] p ON p.ProductId = prod.ProductId " +
+                                     " Inner Join [MundoPanal2].[dbo].[Discounts] d on d.DiscountId = prod.DiscountId_FK" +
+                                     " where prod.CategoryId_FK = {3} and prod.MarcaId_FK = {4} ";
 
-                SqlCommand command = new SqlCommand(queryString, connection);
-                command.Parameters.AddWithValue("percent", pricePercent);
-                command.Parameters.AddWithValue("category", category);
-                command.Parameters.AddWithValue("marca", marca);
+                SqlCommand objSqlCmd = new SqlCommand("", connection);
+
+                string _precetnt = "@percent"; string _category = "@category"; string _marca = "@marca";
+                objSqlCmd.Parameters.Add("@percent", SqlDbType.Int).Value = pricePercent;
+                objSqlCmd.Parameters.Add("@category", SqlDbType.Int).Value = category;
+                objSqlCmd.Parameters.Add("@marca", SqlDbType.Int).Value = marca;
+
+                string strWithParams = string.Format(queryString, _precetnt, _category, _marca, _category, _marca);
+                objSqlCmd.CommandText = strWithParams;
+                objSqlCmd.CommandType = CommandType.Text;
+
 
 #if DEBUG
-                System.Diagnostics.Trace.WriteLine(command.CommandText);
+                System.Diagnostics.Trace.WriteLine(objSqlCmd.CommandText);
 #endif
-                Int32 recordsAffected = command.ExecuteNonQuery();
+                Int32 recordsAffected = objSqlCmd.ExecuteNonQuery();
                 connection.Close();
 
             }
