@@ -23,7 +23,7 @@ namespace WebApi_Mun.Controllers
     [EnableCors(origins: "http://localhost:4200", headers: "*", methods: "*")]
     public class PaymentsController : ApiController 
     {
-        string token = "TEST-4769958945128544-010915-d6d1751ee186d4a06def0a7c0bfb47c7-1265763519";
+        string token = "APP_USR-7912324733117961-031615-8c01725371458674feaeb2d8ecad41ba-1311490712";
     
         [Route("api/payments/post/")]
         [HttpPost]

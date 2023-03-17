@@ -1,0 +1,25 @@
+USE [MundoPanal2]
+GO
+
+/****** Object:  Table [dbo].[Marcas]    Script Date: 17/03/2023 12:04:49 p. m. ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[Marcas](
+	[MarcaId] [int] IDENTITY(1,1) NOT NULL,
+	[Name] [varchar](150) NOT NULL,
+	[State] [tinyint] NULL,
+ CONSTRAINT [PK_Marca] PRIMARY KEY CLUSTERED 
+(
+	[MarcaId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+ALTER TABLE [dbo].[Marcas] ADD  CONSTRAINT [Marca_State]  DEFAULT ((1)) FOR [State]
+GO
+
+
