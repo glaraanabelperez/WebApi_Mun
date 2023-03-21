@@ -10,7 +10,8 @@ using static WebApi_Mun.Data.ProductLogic;
 
 namespace WebApi_Mun.Controllers
 {
-    [EnableCors(origins: "http://localhost:4200", headers: "*", methods: "*")]
+    //[EnableCors(origins: "http://localhost:4200", headers: "*", methods: "*")]
+    [EnableCors(origins: "https://pañaleracolores.com.ar/", headers: "*", methods: "*")]
     public class ProductController : ApiController
     {
         ProductLogic prodLogic = new ProductLogic();

@@ -11,7 +11,8 @@ using WebApi_Mun.Models;
 
 namespace WebApi_Mun.Controllers
 {
-    [EnableCors(origins: "http://localhost:4200", headers: "*", methods: "*")]
+    //[EnableCors(origins: "http://localhost:4200", headers: "*", methods: "*")]
+    [EnableCors(origins: "https://pañaleracolores.com.ar/", headers: "*", methods: "*")]
     public class UserController : ApiController
     {
         public UserLogic user = new UserLogic();

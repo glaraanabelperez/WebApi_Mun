@@ -13,7 +13,8 @@ using System.Drawing;
 
 namespace WebApi_Mun.Controllers
 {
-    [EnableCors(origins: "http://localhost:4200", headers: "*", methods: "*")]
+    //[EnableCors(origins: "http://localhost:4200", headers: "*", methods: "*")]
+    [EnableCors(origins: "https://pañaleracolores.com.ar/", headers: "*", methods: "*")]
     public class ImageController : ApiController
     {
         public ImageLogic imagenLogic = new ImageLogic();
