@@ -9,7 +9,7 @@ using WebApi_Mun.Models;
 namespace WebApi_Mun.Controllers
 {
     //[EnableCors(origins: "http://localhost:4200", headers: "*", methods: "*")]
-    [EnableCors(origins: "https://pañaleracolores.com.ar/", headers: "*", methods: "*")]
+    [EnableCors(origins: "*", headers: "*", methods: "*")]
     public class CategoryController : ApiController
     {
         public CategoryLogic cat = new CategoryLogic();
@@ -22,9 +22,7 @@ namespace WebApi_Mun.Controllers
         public IHttpActionResult GetAll()
         {
             try
-            {
-                //List<ProductModel> orderDToList;
-                
+            {                
                 var list = cat.List();
                 return Ok(list);
             }
@@ -54,7 +52,7 @@ namespace WebApi_Mun.Controllers
             }
             catch (Exception ex)
             {
-                return Content(HttpStatusCode.NotFound, ex.Message);
+                return Content(HttpStatusCode.Ambiguous, ex);
             }
         }
 

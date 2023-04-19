@@ -11,7 +11,7 @@ using static WebApi_Mun.Data.ProductLogic;
 namespace WebApi_Mun.Controllers
 {
     //[EnableCors(origins: "http://localhost:4200", headers: "*", methods: "*")]
-    [EnableCors(origins: "https://pañaleracolores.com.ar/", headers: "*", methods: "*")]
+    [EnableCors(origins: "*", headers: "*", methods: "*")]
     public class ProductController : ApiController
     {
         ProductLogic prodLogic = new ProductLogic();
@@ -91,11 +91,16 @@ namespace WebApi_Mun.Controllers
         /// <returns>Listado de los productos</returns>
         [HttpPost]
         //[Authorize(Roles = "Admin")]
-        public DataTableModel List([FromBody] QueryDataModel<Data.ProductLogic.Filter, Data.ProductLogic.OrderFields> queryData)
+        public IHttpActionResult List([FromBody] QueryDataModel<Data.ProductLogic.Filter, Data.ProductLogic.OrderFields> queryData)
         
         {
-
-            return prodLogic.List(queryData.OrderField, queryData.OrderAsc, queryData.Filter, queryData.From, queryData.Length, out int RecordCount);
+            try
+            {
+                return Ok(prodLogic.List(queryData.OrderField, queryData.OrderAsc, queryData.Filter, queryData.From, queryData.Length, out int RecordCount)) ;
+            }
+            catch (Exception ex) {
+                return Content(HttpStatusCode.InternalServerError, ex.Message);
+            }
 
         }
 
@@ -157,23 +162,22 @@ namespace WebApi_Mun.Controllers
         [HttpDelete]
         public IHttpActionResult ChangeState(int itemId)
         {
-            string ruta = @"C:\Users\LARA\source\repos\Client_Mundo\src\assets";
-
             try
             {
                 int result = prodLogic.Desactive(itemId);
+                return Ok();
 
-                if (result > 0)
-                {
-                    //string pathString = System.IO.Path.Combine(ruta, itemId.ToString());
+                //if (result > 0)
+                //{
+                //    //string pathString = System.IO.Path.Combine(ruta, itemId.ToString());
 
-                     imagenLogic.CleanFolder(itemId);
-                     imagenLogic.DeleteFolder(itemId);
+                //     imagenLogic.CleanFolder(itemId);
+                //     imagenLogic.DeleteFolder(itemId);
 
-                    return Ok();
-                }
-                else
-                    return BadRequest("El elemento no puede eliminarse");
+                //    return Ok();
+                //}
+                //else
+                //    return BadRequest("El elemento no puede eliminarse");
             }
             catch (Exception ex)
             {

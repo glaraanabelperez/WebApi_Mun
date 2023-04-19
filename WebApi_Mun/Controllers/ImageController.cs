@@ -10,16 +10,20 @@ using WebApi_Mun.Data;
 using WebApi_Mun.Models;
 using System.Drawing.Imaging;
 using System.Drawing;
+using Grpc.Core;
+using Microsoft.Ajax.Utilities;
 
 namespace WebApi_Mun.Controllers
 {
     //[EnableCors(origins: "http://localhost:4200", headers: "*", methods: "*")]
-    [EnableCors(origins: "https://pañaleracolores.com.ar/", headers: "*", methods: "*")]
+    [EnableCors(origins: "*", headers: "*", methods: "*")]
     public class ImageController : ApiController
     {
-        public ImageLogic imagenLogic = new ImageLogic();
-        string ruta = @"C:\Users\LARA\source\repos\Client_Mundo\src\assets";
 
+        public ImageLogic imagenLogic = new ImageLogic();
+        //string ruta = (System.Web.Hosting.HostingEnvironment.MapPath("assets"));
+        string ruta = "D:\\Inetpub\\vhosts\\panaleracolores.com.ar\\httpdocs\\assets";
+        
 
         /// <summary>
         /// Listado de todas las imagenes segun producto
@@ -105,16 +109,13 @@ namespace WebApi_Mun.Controllers
         [HttpPut]
         public IHttpActionResult InsertImage(int productId)
         {
+            string pathString = System.IO.Path.Combine(this.ruta, productId.ToString());
             if (productId != 0)
             {
-                // To create a string that specifies the path to a subfolder under your
-                // top-level folder, add a name for the subfolder to folderName.
-                string pathString = System.IO.Path.Combine(this.ruta, productId.ToString());
                 if (!System.IO.File.Exists(pathString))
                 {
                     System.IO.Directory.CreateDirectory(pathString);
                 }
-
                 try
                 {
                     var httpRequest = HttpContext.Current.Request;
@@ -136,11 +137,11 @@ namespace WebApi_Mun.Controllers
                             System.IO.File.WriteAllBytes(filePath, datosArchivo);
 
                         }
-                        return Ok();
+                        return Ok(pathString);
                     }
                     else
                     {
-                        return BadRequest();
+                        return BadRequest(pathString);
                     }
                 }
                 catch (Exception e)
@@ -148,10 +149,11 @@ namespace WebApi_Mun.Controllers
                     return InternalServerError(e);
                 }
             }
-            else{
+            else
+            {
                 return BadRequest();
             }
-            
+
         }
 
     }

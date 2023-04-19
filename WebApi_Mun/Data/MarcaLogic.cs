@@ -1,18 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Runtime.Serialization;
-using System.Web;
 using WebApi_Mun.Models;
 
 namespace WebApi_Mun.Data
 {
-    public class MarcaLogic
+    public class MarcaLogic : BaseLogic
     {
-        static string connectionString = ConfigurationManager.ConnectionStrings["MundoConnection"].ConnectionString;
 
         /// <summary>
         /// Devuelve todos las masrcas
@@ -23,7 +18,7 @@ namespace WebApi_Mun.Data
             var items = new List<MarcaModel>();
             using (var connection = new SqlConnection(connectionString))
             {
-                using(var objCmd = new SqlCommand("Marca_List", connection))
+                using(var objCmd = new SqlCommand("paalerac_colores.[dbo].Marca_List", connection))
                 {
                     connection.Open();
                     objCmd.CommandType = CommandType.StoredProcedure;
@@ -56,7 +51,7 @@ namespace WebApi_Mun.Data
             var items = new List<MarcaModel>();
             using (var connection = new SqlConnection(connectionString))
             {
-                using (var objCmd = new SqlCommand("Marca_List_Active", connection))
+                using (var objCmd = new SqlCommand("paalerac_colores.[dbo].Marca_List_Active", connection))
                 {
                     connection.Open();
                     objCmd.CommandType = CommandType.StoredProcedure;
@@ -114,13 +109,13 @@ namespace WebApi_Mun.Data
 
         private  string SELECT_ALL_BY_MARCA =
         ";Select cm.MarcaId, m.[Name] " +
-        " from[dbo].[CategoryMarcas] cm " +
-        " inner join Marcas m on m.MarcaId=cm.MarcaId where cm.CategoryId = {0} and m.[State]=1;";
+        " from paalerac_colores.[dbo].[CategoryMarcas] cm " +
+        " inner join paalerac_colores.[dbo].Marcas m on m.MarcaId=cm.MarcaId where cm.CategoryId = {0} and m.[State]=1;";
 
 
         private string SELECT_ALL =
         ";Select m.MarcaId, m.[Name] " +
-        " from[dbo].[Marcas] m where m.[State]=1  ";
+        " from paalerac_colores.[dbo].[Marcas] m where m.[State]=1  ";
 
         /// <summary>
         /// Devuelve marcas segun la categorias asociada
@@ -199,15 +194,15 @@ namespace WebApi_Mun.Data
                 var store = "";
                 if (data.MarcaId.HasValue && data.MarcaId != 0 )
                 {
-                    store = "Marca_Update";
+                    store = "paalerac_colores.[dbo].Marca_Update";
                     objCmd = new SqlCommand("Marca_Update", connection);
                 }
                 else
-                    store = "Marca_Add";
+                    store = "paalerac_colores.[dbo].Marca_Add";
 
                 using (objCmd = new SqlCommand(store, connection))
                 {
-                    if (store.Equals("Marca_Update"))
+                    if (store.Equals("paalerac_colores.[dbo].Marca_Update"))
                         objCmd.Parameters.Add("@MarcaId", SqlDbType.Int).Value = data.MarcaId;
                     objCmd.CommandType = CommandType.StoredProcedure;
                     objCmd.Parameters.Add("@Name", SqlDbType.VarChar, 150).Value = data.Name;
@@ -241,7 +236,7 @@ namespace WebApi_Mun.Data
             {
                 SqlCommand objCmd;
                 var store = "";
-                store = "Marca_Desactive";
+                store = "paalerac_colores.[dbo].Marca_Desactive";
                 objCmd = new SqlCommand(store, connection);
 
                 using (objCmd)

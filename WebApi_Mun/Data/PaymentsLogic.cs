@@ -11,10 +11,8 @@ using WebApi_Mun.Models;
 
 namespace WebApi_Mun.Data
 {
-    public class PaymentsLogic
+    public class PaymentsLogic : BaseLogic
     {
-        internal static string connectionString = ConfigurationManager.ConnectionStrings["MundoConnection"].ConnectionString;
-
 
         /// <summary>
         /// Devuelve productos destacados
@@ -25,7 +23,7 @@ namespace WebApi_Mun.Data
             var items = new List<PaymentsModel>();
             using (var connection = new SqlConnection(connectionString))
             {
-                using (var objCmd = new SqlCommand("Payments_ByDate", connection))
+                using (var objCmd = new SqlCommand("paalerac_colores.[dbo].Payments_ByDate", connection))
                 {
                     connection.Open();
                     objCmd.CommandType = CommandType.StoredProcedure;
@@ -58,7 +56,7 @@ namespace WebApi_Mun.Data
         {
             using (var connection = new SqlConnection(connectionString))
             {
-                var store = "Payments_ADD";
+                var store = "paalerac_colores.[dbo].Payments_ADD";
                 var objCmd = new SqlCommand(store, connection);
 
                 objCmd.CommandType = CommandType.StoredProcedure;
@@ -93,7 +91,7 @@ namespace WebApi_Mun.Data
         }
 
         private const string INSERT =
-        ";INSERT INTO [dbo].[Details] ( PaymentId, ProductId, quantity,Amount)" +
+        ";INSERT INTO paalerac_colores.[dbo].[Details] ( PaymentId, ProductId, quantity,Amount)" +
         " VALUES {0} ";
 
         private void InsertProduct(long? PaymentId, PaymentAdditionalInfo dataPayments)
@@ -128,7 +126,7 @@ namespace WebApi_Mun.Data
             {
                 SqlCommand objCmd;
                 var store = "";
-                store = "dbo.Update_Payments";
+                store = "paalerac_colores.[dbo].Update_Payments";
                 objCmd = new SqlCommand(store, connection);
                 objCmd.CommandType = CommandType.StoredProcedure;
 

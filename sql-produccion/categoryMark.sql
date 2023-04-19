@@ -1,7 +1,7 @@
-USE [MundoPanal2]
+USE paalerac_colores
 GO
 
-/****** Object:  Table [dbo].[CategoryMarcas]    Script Date: 17/03/2023 12:03:42 p. m. ******/
+/****** Object:  Table [dbo].[CategoryMarcas]    Script Date: 17/03/2023 12:37:45 p. m. ******/
 SET ANSI_NULLS ON
 GO
 

@@ -1,22 +1,13 @@
-﻿using NUnit.Framework.Interfaces;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
-using System.Diagnostics;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.Serialization;
-using System.Web;
 using WebApi_Mun.Models;
 
 namespace WebApi_Mun.Data
 {
-    public class ProductLogic
+    public class ProductLogic :BaseLogic
     {
-        internal static string connectionString = ConfigurationManager.ConnectionStrings["MundoConnection"].ConnectionString;
-
         #region consulta
 
         /// <summary>
@@ -32,7 +23,6 @@ namespace WebApi_Mun.Data
             /// Nombre del producto
             /// </summary>
             ProductName = 1
-
         }
 
         /// <summary>
@@ -41,7 +31,6 @@ namespace WebApi_Mun.Data
         //[Serializable]
         public class Filter
         {
-
 
             /// <summary>
             /// Filtro para el campo "Estado"
@@ -84,21 +73,21 @@ namespace WebApi_Mun.Data
             " ,A.CategoryId_FK as CategoryId, o.[Name] as CategoryName, A.MarcaId_FK as MarcaId, mar.[Name] as MarcaName " +
             " , ROUND(A.Price, 2, 1) as Price, A.DiscountId_FK as DiscountId, dis.[Amount] DiscountAmount, A.Stock, A.Featured , A.[PriceWithDiscount]" +
             " ,(select top 1 Images.Name " +
-            " from ProductImage" +
-            " inner join Images on Images.ImageId=ProductImage.ImageId_FK " +
+            " from paalerac_colores.[dbo].ProductImage" +
+            " inner join paalerac_colores.[dbo].Images on Images.ImageId=ProductImage.ImageId_FK " +
             " where ProductId_FK = A.ProductId" +
             " ) as ImageName " +
             " , A.CreatedBy_FK as UserId" +
-            " FROM Products AS A " +
-            " INNER JOIN dbo.Categories O ON O.CategoryId = A.CategoryId_FK " +
-            " INNER JOIN [dbo].[Marcas] mar on A.MarcaId_FK= mar.MarcaId" +
-            " left JOIN [dbo].[Discounts] dis on A.DiscountId_FK= dis.DiscountId" +
+            " FROM paalerac_colores.[dbo].Products AS A " +
+            " INNER JOIN paalerac_colores.[dbo].Categories O ON O.CategoryId = A.CategoryId_FK " +
+            " INNER JOIN paalerac_colores.[dbo].[Marcas] mar on A.MarcaId_FK= mar.MarcaId" +
+            " left JOIN paalerac_colores.[dbo].[Discounts] dis on A.DiscountId_FK= dis.DiscountId" +
             " {2} " +
             " ORDER BY {0} {1} ";
 
         private const string OFFSET = " OFFSET {0} ROWS FETCH NEXT {1} ROWS ONLY ";                 //{1} Desde - {2} Hasta
 
-        private const string SELECTCOUNT = "SELECT COUNT(1) AS rows FROM [Products] AS A";
+        private const string SELECTCOUNT = "SELECT COUNT(1) AS rows FROM paalerac_colores.[dbo].[Products] AS A";
         #endregion
 
         /// <summary>
@@ -236,7 +225,7 @@ namespace WebApi_Mun.Data
             var items = new ProductModel();
             using (var connection = new SqlConnection(connectionString))
             {
-                var objCmd = new SqlCommand("Product_Get", connection);
+                var objCmd = new SqlCommand("paalerac_colores.[dbo].Product_Get", connection);
                 objCmd.Parameters.Add("@ProductId", SqlDbType.Int).Value = productId;
                 objCmd.CommandType = CommandType.StoredProcedure;
                 try
@@ -283,7 +272,7 @@ namespace WebApi_Mun.Data
             var items = new ProductModelDto();
 
             using (SqlConnection connection = new SqlConnection(connectionString))
-            using (SqlCommand objCmd = new SqlCommand("Product_GetWithImages", connection))
+            using (SqlCommand objCmd = new SqlCommand("paalerac_colores.[dbo].Product_GetWithImages", connection))
             {
                 objCmd.Parameters.Add("@ProductId", SqlDbType.Int).Value = productId;
                 objCmd.CommandType = CommandType.StoredProcedure;
@@ -345,7 +334,7 @@ namespace WebApi_Mun.Data
             var items = new List<ProductModelDto>();
 
             using (SqlConnection connection = new SqlConnection(connectionString))
-            using (SqlCommand objCmd = new SqlCommand("Product_Featured", connection))
+            using (SqlCommand objCmd = new SqlCommand("paalerac_colores.[dbo].Product_Featured", connection))
             {
                 objCmd.CommandType = CommandType.StoredProcedure;
                 try
@@ -408,12 +397,12 @@ namespace WebApi_Mun.Data
             {
                 var store = "";
                 if (data.ProductId.HasValue && data.ProductId.Value != 0)
-                    store = "Product_Update";
+                    store = "paalerac_colores.[dbo].Product_Update";
                 else
-                    store = "Product_Add";
+                    store = "paalerac_colores.[dbo].Product_Add";
                 var objCmd = new SqlCommand(store, connection);
 
-                if (store.Equals("Product_Update"))
+                if (store.Equals("paalerac_colores.[dbo].Product_Update"))
                     objCmd.Parameters.Add("@ProductId", SqlDbType.Int).Value = data.ProductId;
 
                 objCmd.CommandType = CommandType.StoredProcedure;
@@ -447,7 +436,7 @@ namespace WebApi_Mun.Data
             {
                 SqlCommand objCmd;
                 var store = "";
-                store = "Product_Desactive";
+                store = "paalerac_colores.[dbo].Product_Desactive";
                 objCmd = new SqlCommand(store, connection);
                 objCmd.CommandType = CommandType.StoredProcedure;
 
@@ -466,15 +455,15 @@ namespace WebApi_Mun.Data
             {
 
                 connection.Open();
-                string queryString = " UPDATE [MundoPanal2].[dbo].[Products] " +
+                string queryString = " UPDATE paalerac_colores.[dbo].[Products] " +
                                      " SET PRICE=((PRICE  * {0} )/100)+ PRICE " +
                                      " WHERE [CategoryId_FK] = {1} and [MarcaId_FK] = {2} " +
                                      " UPDATE prod "+
                                      " SET "+
                                      " prod.PriceWithDiscount = prod.Price - d.Amount "+
-                                     " FROM[MundoPanal2].[dbo].[Products]  prod "+
-                                     " INNER JOIN [MundoPanal2].[dbo].[Products] p ON p.ProductId = prod.ProductId " +
-                                     " Inner Join [MundoPanal2].[dbo].[Discounts] d on d.DiscountId = prod.DiscountId_FK" +
+                                     " FROM paalerac_colores.[dbo].[Products]  prod " +
+                                     " INNER JOIN paalerac_colores.[dbo].[Products] p ON p.ProductId = prod.ProductId " +
+                                     " Inner Join paalerac_colores.[dbo].[Discounts] d on d.DiscountId = prod.DiscountId_FK" +
                                      " where prod.CategoryId_FK = {3} and prod.MarcaId_FK = {4} ";
 
                 SqlCommand objSqlCmd = new SqlCommand("", connection);

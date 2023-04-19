@@ -21,7 +21,7 @@ using MercadoPago.Resource.Payment;
 namespace WebApi_Mun.Controllers
 {
     //[EnableCors(origins: "http://localhost:4200", headers: "*", methods: "*")]
-    [EnableCors(origins: "https://pañaleracolores.com.ar/", headers: "*", methods: "*")]
+    [EnableCors(origins: "*", headers: "*", methods: "*")]
     public class PaymentsController : ApiController 
     {
         string token = "APP_USR-7912324733117961-031615-8c01725371458674feaeb2d8ecad41ba-1311490712";

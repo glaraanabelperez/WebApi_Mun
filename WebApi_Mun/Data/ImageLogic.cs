@@ -3,7 +3,6 @@ using MercadoPago.Resource.User;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.IO;
@@ -12,10 +11,10 @@ using WebApi_Mun.Models;
 
 namespace WebApi_Mun.Data
 {
-    public class ImageLogic
+    public class ImageLogic : BaseLogic
     {
-        static string connectionString = ConfigurationManager.ConnectionStrings["MundoConnection"].ConnectionString;
-        string ruta = @"C:\Users\LARA\source\repos\Client_Mundo\src\assets";
+        //string ruta = (System.Web.Hosting.HostingEnvironment.MapPath("assets"));
+        string ruta = "D:\\Inetpub\\vhosts\\panaleracolores.com.ar\\httpdocs\\assets";
 
         /// <summary>
         /// Devuelve todos las imagenes segun el producto
@@ -26,7 +25,7 @@ namespace WebApi_Mun.Data
             var items = new List<ProductImageDto>();
             using (var connection = new SqlConnection(connectionString))
             {
-                using (var objCmd = new SqlCommand("Image_GetByProduct", connection))
+                using (var objCmd = new SqlCommand("paalerac_colores.[dbo].Image_GetByProduct", connection))
                 {
                     connection.Open();
                     objCmd.Parameters.Add("@ProductId", SqlDbType.Int).Value = productId;
@@ -61,12 +60,12 @@ namespace WebApi_Mun.Data
 
                 SqlCommand objCmd;
                 var store = "";
-                store = "Image_Add";
+                store = "paalerac_colores.[dbo].Image_Add";
 
                 using (objCmd = new SqlCommand(store, connection))
                 {
 
-                    if (store.Equals("Image_Add"))
+                    if (store.Equals("paalerac_colores.[dbo].Image_Add"))
                         objCmd.Parameters.Add("@ProductId", SqlDbType.Int).Value = productId;
 
                     objCmd.CommandType = CommandType.StoredProcedure;
@@ -93,7 +92,7 @@ namespace WebApi_Mun.Data
             {
 
                 SqlCommand objCmd;
-                var store = "Image_Delete";
+                var store = "paalerac_colores.[dbo].Image_Delete";
 
                 using (objCmd = new SqlCommand(store, connection))
                 {
@@ -111,11 +110,10 @@ namespace WebApi_Mun.Data
 
         public void DeleteFolder(int productId)
         {
-            string ruta = @"C:\Users\LARA\source\repos\Client_Mundo\src\assets";
 
             try
             {
-                string pathString = System.IO.Path.Combine(ruta, productId.ToString());
+                string pathString = System.IO.Path.Combine(this.ruta, productId.ToString());
                 if (System.IO.Directory.Exists(pathString))
                 {            
                     System.IO.Directory.Delete(pathString);
@@ -140,7 +138,6 @@ namespace WebApi_Mun.Data
                 foreach (string fichero in strFiles)
                 {
                     System.IO.File.Delete(fichero);
-                    //File.Delete(fichero);
                 }
             }
            

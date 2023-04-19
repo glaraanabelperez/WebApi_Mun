@@ -8,20 +8,18 @@ using WebApi_Mun.Models;
 
 namespace WebApi_Mun.Data
 {
-    public class CategoryLogic
+    public class CategoryLogic : BaseLogic
     {
-        static string connectionString = ConfigurationManager.ConnectionStrings["MundoConnection"].ConnectionString;
-
         /// <summary>
         /// Devuelve todos las categorias d eun usuario
         /// </summary>
         /// <returns>Lista de categorias</returns>
-        public  CategoryModel[] List()
+        public CategoryModel[] List()
         {
             var items = new List<CategoryModel>();
             using (var connection = new SqlConnection(connectionString))
             {
-                using(var objCmd = new SqlCommand("Category_List", connection))
+                using(var objCmd = new SqlCommand("paalerac_colores.[dbo].Category_List", connection))
                 {
                     connection.Open();
                     objCmd.CommandType = CommandType.StoredProcedure;
@@ -50,27 +48,31 @@ namespace WebApi_Mun.Data
         public CategoryModel[] ListActive()
         {
             var items = new List<CategoryModel>();
-            using (var connection = new SqlConnection(connectionString))
+            try
             {
-                using (var objCmd = new SqlCommand("Category_List_Active", connection))
+                using (var connection = new SqlConnection(connectionString))
                 {
-                    connection.Open();
-                    objCmd.CommandType = CommandType.StoredProcedure;
-                    SqlDataReader objDR = objCmd.ExecuteReader();
-                    while (objDR.Read())
+                    using (var objCmd = new SqlCommand("paalerac_colores.[dbo].[category_list_active2]", connection))
                     {
-                        var c = new CategoryModel();
-                        c.CategoryId = objDR.GetInt32(0);
-                        c.Name = objDR.GetString(1);
+                        connection.Open();
+                        objCmd.CommandType = CommandType.StoredProcedure;
+                        SqlDataReader objDR = objCmd.ExecuteReader();
+                        while (objDR.Read())
+                        {
+                            var c = new CategoryModel();
+                            c.CategoryId = objDR.GetInt32(0);
+                            c.Name = objDR.GetString(1);
 
-                        items.Add(c);
+                            items.Add(c);
+                        }
+                        return items.ToArray();
                     }
-                    return items.ToArray();
-
                 }
-
             }
-
+            catch(Exception ex)
+            {
+                throw ex;
+            }
         }
 
         /// <summary>
@@ -83,7 +85,7 @@ namespace WebApi_Mun.Data
             var items = new CategoryModel();
             using (var connection = new SqlConnection(connectionString))
             {
-                using (var objCmd = new SqlCommand("Category_Get", connection))
+                using (var objCmd = new SqlCommand("paalerac_colores.[dbo].Category_Get", connection))
                 {
                     objCmd.CommandType = CommandType.StoredProcedure;
                     objCmd.Parameters.Add("@CategoryId", SqlDbType.Int).Value = categoryId;
@@ -107,13 +109,13 @@ namespace WebApi_Mun.Data
 
 
         private const string SELECT_BY =
-        ";Select cm.CategoryId, c.[Name] " +
-        " from[dbo].[CategoryMarcas] cm " +
-        " inner join Categories c on c.CategoryId=cm.CategoryId where cm.MarcaId = {0} and c.[State]=1;" ;
+        ";Select cm.CategoryId, c.Name " +
+        " from paalerac_colores.[dbo].CategoryMarcas cm " +
+        " inner join paalerac_colores.[dbo].Categories c on c.CategoryId=cm.CategoryId where cm.MarcaId = {0} and c.State=1;";
 
         private const string SELECT_ALL =
-        ";Select CategoryId, [Name] " +
-        " from[dbo].[Categories] c where c.[State]=1 ";
+        ";Select CategoryId, Name " +
+        " from paalerac_colores.[dbo].Categories c where c.[State]=1 ";
 
         /// <summary>
         /// Devuelve categorias segun la marca asociada
@@ -188,15 +190,15 @@ namespace WebApi_Mun.Data
                 var store = "";
                 if (data.CategoryId.HasValue && data.CategoryId != 0)
                 {
-                    store = "Category_Update";
+                    store = "paalerac_colores.[dbo].Category_Update";
                     objCmd = new SqlCommand("Category_Update", connection);
 
                 }
                 else
-                    store = "Category_Add";
+                    store = "paalerac_colores.[dbo].Category_Add";
                 using (objCmd = new SqlCommand(store, connection))
                 {
-                    if (store.Equals("Category_Update"))
+                    if (store.Equals("paalerac_colores.[dbo].Category_Update"))
                         objCmd.Parameters.Add("@CategoryId", SqlDbType.Int).Value = data.CategoryId;
 
                     objCmd.CommandType = CommandType.StoredProcedure;
@@ -224,7 +226,7 @@ namespace WebApi_Mun.Data
             {
                 SqlCommand objCmd;
                 var store = "";
-                store = "Category_Desactive";
+                store = "paalerac_colores.[dbo].Category_Desactive";
                 objCmd = new SqlCommand(store, connection);
 
                 using (objCmd)

@@ -9,7 +9,7 @@ using WebApi_Mun.Models;
 namespace WebApi_Mun.Controllers
 {
     //[EnableCors(origins: "http://localhost:4200", headers: "*", methods: "*")]
-    [EnableCors(origins: "https://pañaleracolores.com.ar/", headers: "*", methods: "*")]
+    [EnableCors(origins: "*", headers: "*", methods: "*")]
     public class MarcaController : ApiController
     {
         public MarcaLogic mar = new MarcaLogic();

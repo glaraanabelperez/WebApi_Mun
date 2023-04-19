@@ -8,6 +8,7 @@ namespace WebApi_Mun.Controllers
 {
     public class HomeController : Controller
     {
+        [HttpGet]
         public ActionResult Index()
         {
             ViewBag.Title = "Home Page";

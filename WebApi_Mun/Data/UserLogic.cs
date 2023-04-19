@@ -1,24 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Runtime.Serialization;
-using System.Web;
 using WebApi_Mun.Models;
 
 namespace WebApi_Mun.Data
 {
-    public  class UserLogic
+    public  class UserLogic :BaseLogic
     {
-        static string connectionString = ConfigurationManager.ConnectionStrings["MundoConnection"].ConnectionString;
-
         public LoginModel Login(LoginModel data)
         {
             using (var connection = new SqlConnection(connectionString))
             {
-                using (var command = new SqlCommand("Login", connection))
+                using (var command = new SqlCommand("paalerac_colores.[dbo].Login", connection))
                 {
                     command.Parameters.Add("@UserName", SqlDbType.VarChar).Value = data.UserName;
                     command.Parameters.Add("@Password", SqlDbType.VarChar).Value = data.Password;
@@ -54,7 +47,7 @@ namespace WebApi_Mun.Data
             var items = new UserModel();
             using (var connection = new SqlConnection(connectionString))
             {
-                using (var command = new SqlCommand("User_Get", connection))
+                using (var command = new SqlCommand("paalerac_colores.[dbo].User_Get", connection))
                 {
                     command.Parameters.Add("@UserId", SqlDbType.Int).Value = userId;
                     command.CommandType = CommandType.StoredProcedure;
@@ -90,7 +83,7 @@ namespace WebApi_Mun.Data
         {
             using (var connection = new SqlConnection(connectionString))
             {
-                using (SqlCommand objCmd = new SqlCommand("User_Update", connection))
+                using (SqlCommand objCmd = new SqlCommand("paalerac_colores.[dbo].User_Update", connection))
                 {
                     objCmd.CommandType = CommandType.StoredProcedure;
                     objCmd.Parameters.Add("@UserId", SqlDbType.Int).Value = data.UserId;
@@ -122,7 +115,7 @@ namespace WebApi_Mun.Data
             using (var connection = new SqlConnection(connectionString))
             {
 
-                using (SqlCommand objCmd = new SqlCommand("User_Add", connection))
+                using (SqlCommand objCmd = new SqlCommand("paalerac_colores.[dbo].User_Add", connection))
                 {
                     objCmd.CommandType = CommandType.StoredProcedure;
 
