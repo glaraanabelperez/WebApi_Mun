@@ -10,7 +10,7 @@ GO
 
 
 
-CREATE OR ALTER PROCEDURE paalerac_colores.dbo.[dbo].[Image_Add]
+CREATE OR ALTER PROCEDURE [dbo].[Image_Add]
 @Name varchar(250),
 @ProductId int
 AS

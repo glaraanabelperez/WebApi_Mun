@@ -165,19 +165,18 @@ namespace WebApi_Mun.Controllers
             try
             {
                 int result = prodLogic.Desactive(itemId);
-                return Ok();
 
-                //if (result > 0)
-                //{
-                //    //string pathString = System.IO.Path.Combine(ruta, itemId.ToString());
+                if (result > 0)
+                {
+                    //string pathString = System.IO.Path.Combine(ruta, itemId.ToString());
 
-                //     imagenLogic.CleanFolder(itemId);
-                //     imagenLogic.DeleteFolder(itemId);
+                    imagenLogic.CleanFolder(itemId);
+                    imagenLogic.DeleteFolder(itemId);
 
-                //    return Ok();
-                //}
-                //else
-                //    return BadRequest("El elemento no puede eliminarse");
+                    return Ok();
+                }
+                else
+                    return BadRequest("El elemento no puede eliminarse");
             }
             catch (Exception ex)
             {

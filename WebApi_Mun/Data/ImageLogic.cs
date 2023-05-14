@@ -61,19 +61,17 @@ namespace WebApi_Mun.Data
                 SqlCommand objCmd;
                 var store = "";
                 store = "paalerac_colores.[dbo].Image_Add";
+                objCmd = new SqlCommand(store, connection);
 
-                using (objCmd = new SqlCommand(store, connection))
+                using (objCmd)
                 {
-
-                    if (store.Equals("paalerac_colores.[dbo].Image_Add"))
-                        objCmd.Parameters.Add("@ProductId", SqlDbType.Int).Value = productId;
-
                     objCmd.CommandType = CommandType.StoredProcedure;
+                    objCmd.Parameters.Add("@ProductId", SqlDbType.Int).Value = productId;
                     objCmd.Parameters.Add("@Name", SqlDbType.VarChar).Value = data;
 
                     connection.Open();
                     var result = objCmd.ExecuteNonQuery();
-
+                    connection.Close();
                     return result;
                 }
 
@@ -114,10 +112,10 @@ namespace WebApi_Mun.Data
             try
             {
                 string pathString = System.IO.Path.Combine(this.ruta, productId.ToString());
-                if (System.IO.Directory.Exists(pathString))
+                if (System.IO.File.Exists(pathString))
                 {            
-                    System.IO.Directory.Delete(pathString);
-                    //System.IO.File.Delete(pathString);
+                    //System.IO.Directory.Delete(pathString);
+                    System.IO.File.Delete(pathString);
 
                 }
 
@@ -130,8 +128,9 @@ namespace WebApi_Mun.Data
 
         public void CleanFolder(int productId)
         {
+
             string pathString = System.IO.Path.Combine(this.ruta, productId.ToString());
-            if (Directory.Exists(pathString))
+            if (File.Exists(pathString))
             {
                 List<string> strFiles = Directory.GetFiles(pathString, "*", SearchOption.AllDirectories).ToList();
 
@@ -140,6 +139,9 @@ namespace WebApi_Mun.Data
                     System.IO.File.Delete(fichero);
                 }
             }
+
+
+
            
         }
 

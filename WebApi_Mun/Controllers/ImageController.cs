@@ -64,10 +64,10 @@ namespace WebApi_Mun.Controllers
                     {
 
                         int result = imagenLogic.Delete(image);
-                        if (File.Exists(pathString + "\\" + image.Name) && result > 0)
-                        {
+                        //if (File.Exists(pathString + "\\" + image.Name) && result > 0)
+                        //{
                             System.IO.File.Delete(System.IO.Path.Combine(pathString, image.Name));
-                        }
+                        //}
                     }
                     else
                     {
@@ -146,7 +146,7 @@ namespace WebApi_Mun.Controllers
                 }
                 catch (Exception e)
                 {
-                    return InternalServerError(e);
+                    return BadRequest(e.Message);
                 }
             }
             else
