@@ -11,7 +11,7 @@ Running Locally
 SQLQueryMundoPanal2.sql
 SQLQueryCreateTableSalesAndDetails
 1 bis) Run Scripts store procedure
-https://github.com/glaraanabelperez/WebApi_Mun/tree/master/WebApi_Mun/SQL
+https://github.com/glaraanabelperez/WebApi_Mun/tree/master/sql-produccion
 2)Download proyect
 3)Install
 Aqua.Core (Transform any object-graph into a dynamic, composed dictionaries like structure, holding serializable values and type information.)
