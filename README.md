@@ -3,8 +3,7 @@
 # WebApi_Mun
 webApi .net framwork 4.7 con ado.net
 
-![image](https://user-images.githubusercontent.com/55300998/211825994-a8df4683-f24d-49f8-98cb-89182ba485d8.png)
-
+![image](https://github.com/glaraanabelperez/WebApi_Mun/assets/55300998/d3104489-06d6-482c-ad2b-b4823a2475a9)
 
 Tasks
 Running Locally
