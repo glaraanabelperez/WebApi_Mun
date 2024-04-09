@@ -1,7 +1,7 @@
 
 
 # WebApi_Mun
-webApi .net framwork 4.7 con ado.net
+webApi .net framwork 4.7 , Sql server
 
 
 Tasks
